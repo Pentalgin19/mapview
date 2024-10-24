@@ -62,7 +62,7 @@ class EeE {
         val searchManager =
             SearchFactory.getInstance().createSearchManager(SearchManagerType.COMBINED)
         val searchOptions = SearchOptions().apply {
-            searchTypes = SearchType.BIZ.value
+            searchTypes = 2
             resultPageSize = 32
         }
 
