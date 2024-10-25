@@ -1,6 +1,7 @@
 package com.example.navigation;
 
 import android.app.Activity;
+import android.location.Location;
 import android.os.Bundle;
 import android.view.KeyEvent;
 import android.view.inputmethod.EditorInfo;
@@ -34,6 +35,8 @@ public class MainActivity3 extends Activity implements Session.SearchListener, C
     private EditText searchEdit;
     private SearchManager searchManager;
     private Session searchSession;
+    private SearchJava searchJava = new SearchJava();
+    private Location location = searchJava.getLocation();
 
     private void submitQuery(String query) {
         searchSession = searchManager.submit(
@@ -45,8 +48,10 @@ public class MainActivity3 extends Activity implements Session.SearchListener, C
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        setContentView(R.layout.activity_main3);
         super.onCreate(savedInstanceState);
+        MapKitFactory.setApiKey("eed2a724-fc95-4e5d-935a-8e0c346df956");
+        MapKitFactory.initialize(this);
+        setContentView(R.layout.activity_main3);
 
         searchManager = SearchFactory.getInstance().createSearchManager(SearchManagerType.COMBINED);
 
@@ -66,7 +71,8 @@ public class MainActivity3 extends Activity implements Session.SearchListener, C
         });
 
         mapView.getMapWindow().getMap().move(
-                new CameraPosition(new Point(), 14.0f, 0.0f, 0.0f));
+                new CameraPosition(new Point(location.getLatitude(), location.getLongitude()),
+                        14.0f, 0.0f, 0.0f));
 
         submitQuery(searchEdit.getText().toString());
     }
