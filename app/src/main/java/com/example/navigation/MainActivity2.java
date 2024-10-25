@@ -21,6 +21,8 @@ import androidx.core.app.ActivityCompat;
 import com.example.navigation.databinding.ActivityMain2Binding;
 import com.yandex.mapkit.MapKitFactory;
 import com.yandex.mapkit.mapview.MapView;
+import com.yandex.mapkit.search.SearchFactory;
+import com.yandex.mapkit.search.SearchManagerType;
 
 public class MainActivity2 extends Activity {
 
@@ -55,12 +57,13 @@ public class MainActivity2 extends Activity {
         tvLocationNet = (TextView) findViewById(R.id.tvLocationNet);
         binding.btnLocationSettings.setOnClickListener(v -> {
             if (search != null){
-                EeE eee = new EeE();
-                eee.search(mapView);
+//                EeE eee = new EeE(this);
+//                eee.search(mapView, binding.edSearch.getText().toString(), this,
+//                        location.getLatitude(), location.getLongitude() );
             }
+
         });
 
-        locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
         binding.edSearch.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
@@ -77,6 +80,8 @@ public class MainActivity2 extends Activity {
 
             }
         });
+
+        locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
     }
 
     @Override
@@ -99,12 +104,18 @@ public class MainActivity2 extends Activity {
         locationManager.removeUpdates(locationListener);
     }
 
+    private Location location;
+    void setLocation(Location location1){
+        location = location1;
+    }
+
     private LocationListener locationListener = new LocationListener() {
 
         @Override
         public void onLocationChanged(Location location) {
             showLocation(location);
-            EeE eee = new EeE();
+            setLocation(location);
+            EeE eee = new EeE(MainActivity2.this);
             eee.setPoint(mapView, MainActivity2.this, location.getLatitude(), location.getLongitude());
         }
 
