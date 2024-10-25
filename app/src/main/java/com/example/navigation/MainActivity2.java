@@ -4,6 +4,7 @@ import java.util.Date;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationListener;
@@ -79,7 +80,9 @@ public class MainActivity2 extends Activity{
         tvLocationNet = (TextView) findViewById(R.id.tvLocationNet);
         binding.btnLocationSettings.setOnClickListener(v -> {
             if (search != null){
-
+                EeE eee = new EeE(this, mapView);
+                eee.editText = binding.edSearch;
+                eee.marsh();
             }
 
         });
@@ -102,8 +105,6 @@ public class MainActivity2 extends Activity{
         });
 
         locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
-
-
     }
 
     @Override
@@ -132,9 +133,14 @@ public class MainActivity2 extends Activity{
         public void onLocationChanged(Location location) {
             showLocation(location);
             searchJava = new SearchJava();
-            searchJava.setLocation(location);
+            searchJava.setLocation(location, MainActivity2.this);
+            SharedPreferences sp = getSharedPreferences("Location", MODE_PRIVATE);
+            SharedPreferences.Editor editor = sp.edit();
+            editor.putFloat("lat", (float) location.getLatitude());
+            editor.putFloat("lon", (float) location.getLongitude());
+            editor.apply();
             EeE eee = new EeE(MainActivity2.this, mapView);
-            eee.setPoint(mapView, MainActivity2.this, location.getLatitude(), location.getLongitude());
+            eee.setPoint(location.getLatitude(), location.getLongitude());
         }
 
         @Override
