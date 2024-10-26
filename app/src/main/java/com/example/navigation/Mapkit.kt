@@ -22,6 +22,7 @@ import com.yandex.mapkit.directions.driving.DrivingRouterType
 import com.yandex.mapkit.directions.driving.DrivingSession
 import com.yandex.mapkit.directions.driving.VehicleOptions
 import com.yandex.mapkit.layers.ObjectEvent
+import com.yandex.mapkit.location.Location
 import com.yandex.mapkit.map.CameraListener
 import com.yandex.mapkit.map.CameraPosition
 import com.yandex.mapkit.map.CameraUpdateReason
@@ -50,6 +51,8 @@ class Mapkit(
     val searchEditText: EditText
 ) : UserLocationObjectListener,
     Session.SearchListener, CameraListener, DrivingSession.DrivingRouteListener {
+    var latitude: Double = 0.0000
+    var longitude: Double = 0.0000
     val mapView = mapView
 
     val mapkit = MapKitFactory.getInstance()
@@ -57,9 +60,11 @@ class Mapkit(
     var locationMapkit = mapkit.createUserLocationLayer(mapView.mapWindow)
     lateinit var searchManager: SearchManager
     lateinit var session: Session
+    private var check = false
 
-    private val routeStartLocation = com.yandex.mapkit.geometry.Point(51.765334, 55.124147)
-    private val routeEndLocation = com.yandex.mapkit.geometry.Point(51.770846, 55.123653)//
+    private var routeStartLocation = com.yandex.mapkit.geometry.Point(0.0000, 0.000)
+    private var routeEndLocation =
+        com.yandex.mapkit.geometry.Point(51.770846, 55.123653)//51.770846, 55.123653
     private val screenCenter = com.yandex.mapkit.geometry.Point(
         (routeStartLocation.latitude + routeEndLocation.latitude) / 2,
         (routeStartLocation.longitude + routeEndLocation.longitude) / 2,
@@ -69,7 +74,7 @@ class Mapkit(
     private var drivingSession: DrivingSession? = null
 
     fun loc() {
-        locationMapkit.isVisible = false
+        locationMapkit.isVisible = true
         locationMapkit.setObjectListener(this)
         searchManager = SearchFactory.getInstance().createSearchManager(SearchManagerType.COMBINED)
         mapView.map.addCameraListener(this)
@@ -79,11 +84,6 @@ class Mapkit(
             }
             false
         }
-        drivingRouter =
-            DirectionsFactory.getInstance().createDrivingRouter(DrivingRouterType.COMBINED)
-        mapObjects = mapView.map.mapObjects.addCollection()
-
-        submitRequest()
     }
 
     private var t = false
@@ -196,6 +196,7 @@ class Mapkit(
         if (finished) {
             submitQuery(searchEditText.text.toString())
         }
+
     }
 
     override fun onDrivingRoutes(p0: MutableList<DrivingRoute>) {
@@ -212,10 +213,20 @@ class Mapkit(
     private fun submitRequest() {
         val drivingOptions = DrivingOptions()
         val vehicleOptions = VehicleOptions()
-        val requestPoints: ArrayList<RequestPoint> = ArrayList()
+        var requestPoints: ArrayList<RequestPoint> = ArrayList()
         requestPoints.add(RequestPoint(routeStartLocation, RequestPointType.WAYPOINT, null, null))
         requestPoints.add(RequestPoint(routeEndLocation, RequestPointType.WAYPOINT, null, null))
-        drivingSession = drivingRouter!!.requestRoutes(requestPoints, drivingOptions, vehicleOptions, this)
-        Toast.makeText(context, "sdftyui", Toast.LENGTH_SHORT).show()
+        drivingSession =
+            drivingRouter!!.requestRoutes(requestPoints, drivingOptions, vehicleOptions, this)
+    }
+
+    fun setRoute() {
+        routeEndLocation = com.yandex.mapkit.geometry.Point(EeE.latitude, EeE.longitude)
+        routeStartLocation = com.yandex.mapkit.geometry.Point(latitude, longitude)
+        drivingRouter =
+            DirectionsFactory.getInstance().createDrivingRouter(DrivingRouterType.COMBINED)
+        mapObjects = mapView.map.mapObjects.addCollection()
+
+        submitRequest()
     }
 }

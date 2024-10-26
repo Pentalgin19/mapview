@@ -100,7 +100,7 @@ public class MainActivity2 extends Activity {
         locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
 
         binding.btnShowRoute.setOnClickListener(v -> {
-            mapkit.loc();
+            mapkit.setRoute();
         });
     }
 
@@ -128,8 +128,13 @@ public class MainActivity2 extends Activity {
 
         @Override
         public void onLocationChanged(Location location) {
-            EeE eee = new EeE(MainActivity2.this, mapView);
-            eee.setPoint(location.getLatitude(), location.getLongitude());
+            mapkit.setLatitude(location.getLatitude());
+            mapkit.setLongitude(location.getLongitude());
+            if (showWhereIAM){
+                EeE eee = new EeE(MainActivity2.this, mapView);
+                eee.setPoint(location.getLatitude(), location.getLongitude());
+                showWhereIAM=false;
+            }
         }
 
         @Override
