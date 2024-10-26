@@ -16,8 +16,6 @@ import com.yandex.mapkit.mapview.MapView
 import kotlin.properties.Delegates
 
 
-private var latitude by Delegates.notNull<Double>()
-private var lotitude by Delegates.notNull<Double>()
 private lateinit var binding: ActivityMainBinding
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -39,30 +37,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    val locationListener = object : LocationListener{
-        override fun onLocationUpdated(p0: Location) {
-            val main = MainActivity2()
-            val location = main.location()
-            val s = intent.extras
-            val a = location.indexOf("lat =") + 5
-            val b = location.indexOf(",")
-            var c = "" // широта
-            for (i in a..b) {
-                c += location[i]
-            }
-            val a1 = location.indexOf("lon =")
-            val b1 = location.length - 1
-            var c1 = ""
-            for (i in a1..b1) {
-                c1 += location[i]
-            }
-            binding.text.text = location + "jgjkhjgjkklh"
-        }
 
-        override fun onLocationStatusUpdated(p0: LocationStatus) {
-
-        }
-    }
     private fun isLocationPermissionGranted(): Boolean {
         return if (ActivityCompat.checkSelfPermission(
                 this,

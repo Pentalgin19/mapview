@@ -28,4 +28,6 @@
     <string name="package_name">com.yandex.mapkitdemo</string>
 
     <string name="mapkit_version_label">MapKit version</string>
+    <string name="show_traffic_jams">Show traffic jams</string>
+    <string name="show_route">Show route</string>
 </resources>

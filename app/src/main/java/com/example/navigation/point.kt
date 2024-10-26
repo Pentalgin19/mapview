@@ -55,6 +55,10 @@ class EeE(context: Context, mapView: MapView) {
     val mapView = mapView
     val finalTarget = Point(51.768996, 55.100944)
     val context = context
+    companion object{
+        @JvmStatic var latitude = 0.000
+        @JvmStatic var longitude = 0.000
+    }
 
     fun setPoint(latitude: Double, longitude: Double) {
         val circle = Circle(
@@ -66,8 +70,10 @@ class EeE(context: Context, mapView: MapView) {
             strokeColor = ContextCompat.getColor(context, com.example.navigation.R.color.red)
             fillColor = ContextCompat.getColor(context, com.example.navigation.R.color.red_alpfa)
         }
+
         setCameraPosition(latitude, longitude)
-        mapView.map.addInputListener(inputListener)
+        mapView.map.addTapListener(tapListener)
+//        mapView.map.addInputListener(inputListener)
     }
 
     fun setCameraPosition(latitude: Double, longitude: Double) {
@@ -97,29 +103,6 @@ class EeE(context: Context, mapView: MapView) {
         override fun onDrivingRoutesError(error: Error) {
             Toast.makeText(context, "bad", Toast.LENGTH_SHORT).show()
         }
-    }
-
-    fun marsh(){
-        val java = SearchJava();
-        val drivingRouter = DirectionsFactory.getInstance().createDrivingRouter(DrivingRouterType.COMBINED)
-        val drivingOptions = DrivingOptions().apply {
-            routesCount = 3
-        }
-        val vehicleOptions = VehicleOptions()
-        val points = buildList {
-            add(RequestPoint(finalTarget, RequestPointType.WAYPOINT, null, null))
-            add(RequestPoint(Point(java.getLat(context) ?: 0.00000, java.getLon(context)),
-                RequestPointType.WAYPOINT, null, null))
-        }
-
-        val drivingSession = drivingRouter.requestRoutes(
-            points,
-            drivingOptions,
-            vehicleOptions,
-            drivingRouteListener
-        )
-
-
     }
 
     val searchSessionListener = object : Session.SearchListener {
@@ -176,7 +159,6 @@ class EeE(context: Context, mapView: MapView) {
             searchSession1 = searchManager.submit(point, 20, SearchOptions(), searchListener)
 
 
-            mapView.map.addTapListener(tapListener)
         }
 
         override fun onMapLongTap(map: Map, point: Point) {}
@@ -189,6 +171,9 @@ class EeE(context: Context, mapView: MapView) {
                 .metadataContainer
                 .getItem(GeoObjectSelectionMetadata::class.java)
             mapView.map.selectGeoObject(selectionMetadata)
+            latitude = geoObjectTapEvent.geoObject.geometry[0].point!!.latitude
+            longitude = geoObjectTapEvent.geoObject.geometry[0].point!!.longitude
+            Toast.makeText(context, latitude.toString() + " " + longitude.toString(), Toast.LENGTH_SHORT).show()
             return false
         }
     }

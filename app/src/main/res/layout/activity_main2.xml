@@ -6,71 +6,37 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:padding="5dp">
-    <TextView
-        android:id="@+id/tvTitleGPS"
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/provider_gps"
-        android:textSize="30sp">
-    </TextView>
-    <TextView
-        android:id="@+id/tvEnabledGPS"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textSize="24sp">
-    </TextView>
-    <TextView
-        android:id="@+id/tvStatusGPS"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textSize="24sp">
-    </TextView>
-    <TextView
-        android:id="@+id/tvLocationGPS"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textSize="24sp">
-    </TextView>
-    <TextView
-        android:id="@+id/tvTitleNet"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
-        android:text="@string/provider_network"
-        android:textSize="30sp">
-    </TextView>
-    <TextView
-        android:id="@+id/tvEnabledNet"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textSize="24sp">
-    </TextView>
-    <TextView
-        android:id="@+id/tvStatusNet"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textSize="24sp">
-    </TextView>
-    <TextView
-        android:id="@+id/tvLocationNet"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textSize="24sp">
-    </TextView>
-    <Button
-        android:id="@+id/btnLocationSettings"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
-        android:text="@string/show_results">
-    </Button>
+        android:orientation="horizontal">
+        <Button
+            android:id="@+id/btnShowResults"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/show_results"/>
+        <Button
+            android:id="@+id/btnShowTrafficJams"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/show_traffic_jams"/>
+        <Button
+            android:id="@+id/btnShowRoute"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/show_route"/>
+    </LinearLayout>
 
     <EditText
         android:id="@+id/edSearch"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="@string/location_settings"
-        android:minHeight="48dp" />
+        android:minHeight="48dp"
+        android:imeOptions="actionSearch"
+        android:inputType="text"
+        android:maxLines="1"/>
+
     <com.yandex.mapkit.mapview.MapView
         android:id="@+id/mapView"
         android:layout_width="match_parent"

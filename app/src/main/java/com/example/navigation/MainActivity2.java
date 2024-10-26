@@ -15,6 +15,7 @@ import android.text.TextWatcher;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
+import android.widget.Button;
 import android.widget.SearchView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -44,22 +45,18 @@ import com.yandex.runtime.image.ImageProvider;
 import com.yandex.runtime.network.NetworkError;
 import com.yandex.runtime.network.RemoteError;
 
-public class MainActivity2 extends Activity{
+public class MainActivity2 extends Activity {
 
-    TextView tvEnabledGPS;
-    TextView tvStatusGPS;
-    TextView tvLocationGPS;
-    TextView tvEnabledNet;
-    TextView tvStatusNet;
-    TextView tvLocationNet;
+    Button button;
 
     private LocationManager locationManager;
     private ActivityMain2Binding binding;
     private MapView mapView;
     private String search;
-    private SearchJava searchJava;
     private SearchManager searchManager;
     private Session searchSession;
+    private Mapkit mapkit;
+    private Boolean showWhereIAM = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,22 +66,18 @@ public class MainActivity2 extends Activity{
         binding = ActivityMain2Binding.inflate(getLayoutInflater());
         View view = binding.getRoot();
         setContentView(view);
+        button = binding.btnShowTrafficJams;
         searchManager = SearchFactory.getInstance().createSearchManager(SearchManagerType.COMBINED);
         mapView = binding.mapView;
-        mapView.getMapWindow().getMap().addCameraListener(c);
-        tvEnabledGPS = (TextView) findViewById(R.id.tvEnabledGPS);
-        tvStatusGPS = (TextView) findViewById(R.id.tvStatusGPS);
-        tvLocationGPS = (TextView) findViewById(R.id.tvLocationGPS);
-        tvEnabledNet = (TextView) findViewById(R.id.tvEnabledNet);
-        tvStatusNet = (TextView) findViewById(R.id.tvStatusNet);
-        tvLocationNet = (TextView) findViewById(R.id.tvLocationNet);
-        binding.btnLocationSettings.setOnClickListener(v -> {
-            if (search != null){
-                EeE eee = new EeE(this, mapView);
-                eee.editText = binding.edSearch;
-                eee.marsh();
+        mapkit = new Mapkit(mapView, this, this, binding.edSearch);
+        binding.btnShowResults.setOnClickListener(v -> {
+            if (search != null) {
+                mapkit.loc();
             }
+        });
 
+        button.setOnClickListener(v -> {
+            mapkit.showTrafficJams();
         });
 
         binding.edSearch.addTextChangedListener(new TextWatcher() {
@@ -105,6 +98,10 @@ public class MainActivity2 extends Activity{
         });
 
         locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
+
+        binding.btnShowRoute.setOnClickListener(v -> {
+            mapkit.loc();
+        });
     }
 
     @Override
@@ -131,14 +128,6 @@ public class MainActivity2 extends Activity{
 
         @Override
         public void onLocationChanged(Location location) {
-            showLocation(location);
-            searchJava = new SearchJava();
-            searchJava.setLocation(location, MainActivity2.this);
-            SharedPreferences sp = getSharedPreferences("Location", MODE_PRIVATE);
-            SharedPreferences.Editor editor = sp.edit();
-            editor.putFloat("lat", (float) location.getLatitude());
-            editor.putFloat("lon", (float) location.getLongitude());
-            editor.apply();
             EeE eee = new EeE(MainActivity2.this, mapView);
             eee.setPoint(location.getLatitude(), location.getLongitude());
         }
@@ -156,50 +145,15 @@ public class MainActivity2 extends Activity{
                     != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(MainActivity2.this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
                 return;
             }
-            showLocation(locationManager.getLastKnownLocation(provider));
         }
 
         @Override
         public void onStatusChanged(String provider, int status, Bundle extras) {
-            if (provider.equals(LocationManager.GPS_PROVIDER)) {
-                tvStatusGPS.setText("Status: " + String.valueOf(status));
-            } else if (provider.equals(LocationManager.NETWORK_PROVIDER)) {
-                tvStatusNet.setText("Status: " + String.valueOf(status));
-            }
         }
     };
 
-    private void showLocation(Location location) {
-        if (location == null)
-            return;
-        if (location.getProvider().equals(LocationManager.GPS_PROVIDER)) {
-            tvLocationGPS.setText(formatLocation(location));
-        } else if (location.getProvider().equals(
-                LocationManager.NETWORK_PROVIDER)) {
-            tvLocationNet.setText(formatLocation(location));
-        }
-    }
-
-    public String formatLocation(Location location) {
-        if (location == null)
-            return "";
-        String a = String.format(
-                "Coordinates: lat = %1$.4f, lon = %2$.4f",
-                location.getLatitude(), location.getLongitude());
-        return a;
-    }
-
     private void checkEnabled() {
-        tvEnabledGPS.setText("Enabled: "
-                + locationManager
-                .isProviderEnabled(LocationManager.GPS_PROVIDER));
-        tvEnabledNet.setText("Enabled: "
-                + locationManager
-                .isProviderEnabled(LocationManager.NETWORK_PROVIDER));
-    }
 
-    public String location(){
-        return tvLocationNet.getText().toString();
     }
 
     @Override
@@ -215,53 +169,5 @@ public class MainActivity2 extends Activity{
         mapView.onStop();
         super.onStop();
     }
-    private Session.SearchListener s = new Session.SearchListener() {
-        @Override
-        public void onSearchResponse(@NonNull Response response) {
-            MapObjectCollection mapObjects = mapView.getMapWindow().getMap().getMapObjects();
-            mapObjects.clear();
-            for (GeoObjectCollection.Item searchResult : response.getCollection().getChildren()) {
-                final Point resultLocation = searchResult.getObj().getGeometry().get(0).getPoint();
-                if (resultLocation != null) {
-                    mapObjects.addPlacemark(placemark -> {
-                        placemark.setGeometry(resultLocation);
-                    });
-                }
-            }
-        }
 
-        @Override
-        public void onSearchError(@NonNull Error error) {
-            String errorMessage = getString(R.string.unknown_error_message);
-            if (error instanceof RemoteError) {
-                errorMessage = getString(R.string.remote_error_message);
-            } else if (error instanceof NetworkError) {
-                errorMessage = getString(R.string.network_error_message);
-            }
-
-            Toast.makeText(MainActivity2.this, errorMessage, Toast.LENGTH_SHORT).show();
-        }
-    };
-
-    private void submitQuery(String query) {
-        searchSession = searchManager.submit(
-                query,
-                VisibleRegionUtils.toPolygon(mapView.getMapWindow().getMap().getVisibleRegion()),
-                new SearchOptions(),
-                s
-
-        );
-    }
-
-    private CameraListener c = new CameraListener() {
-        @Override
-        public void onCameraPositionChanged(Map map,
-                                            CameraPosition cameraPosition,
-                                            CameraUpdateReason cameraUpdateReason,
-                                            boolean finished) {
-                if (finished) {
-                    submitQuery(binding.edSearch.getText().toString());
-                }
-        }
-    };
 }
