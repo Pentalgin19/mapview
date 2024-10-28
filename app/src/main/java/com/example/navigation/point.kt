@@ -1,26 +1,13 @@
 package com.example.navigation
 
-import android.R
-import android.app.Activity
-import android.app.SearchManager
 import android.content.Context
-import android.content.SharedPreferences
-import android.os.Bundle
 import android.view.inputmethod.EditorInfo
 import android.widget.EditText
 import android.widget.TextView.OnEditorActionListener
 import android.widget.Toast
-import androidx.core.content.ContextCompat
 import com.yandex.mapkit.Animation
-import com.yandex.mapkit.MapKitFactory
-import com.yandex.mapkit.RequestPoint
-import com.yandex.mapkit.RequestPointType
-import com.yandex.mapkit.directions.DirectionsFactory
-import com.yandex.mapkit.directions.driving.DrivingOptions
 import com.yandex.mapkit.directions.driving.DrivingRoute
-import com.yandex.mapkit.directions.driving.DrivingRouterType
 import com.yandex.mapkit.directions.driving.DrivingSession
-import com.yandex.mapkit.directions.driving.VehicleOptions
 import com.yandex.mapkit.geometry.Circle
 import com.yandex.mapkit.geometry.Geometry
 import com.yandex.mapkit.geometry.Point
@@ -37,7 +24,6 @@ import com.yandex.mapkit.map.PlacemarkMapObject
 import com.yandex.mapkit.map.VisibleRegionUtils
 import com.yandex.mapkit.mapview.MapView
 import com.yandex.mapkit.search.Address
-import com.yandex.mapkit.search.FuelMetadata
 import com.yandex.mapkit.search.Response
 import com.yandex.mapkit.search.SearchFactory
 import com.yandex.mapkit.search.SearchManagerType
@@ -60,18 +46,28 @@ class EeE(context: Context, mapView: MapView) {
         @JvmStatic var longitude = 0.000
     }
 
-    fun setPoint(latitude: Double, longitude: Double) {
+    fun setPoint(latitude: Double, longitude: Double, showResults: Boolean = false) {
         val circle = Circle(
             Point(latitude, longitude),
             20f
         )
-        val placemark = mapView.map.mapObjects.addCircle(circle).apply {
-            strokeWidth = 2f
-            strokeColor = ContextCompat.getColor(context, com.example.navigation.R.color.red)
-            fillColor = ContextCompat.getColor(context, com.example.navigation.R.color.red_alpfa)
+        var placemark: PlacemarkMapObject
+        if (!showResults){
+            placemark = mapView.map.mapObjects.addPlacemark().apply {
+                geometry = Point(Mapkit.latitude, Mapkit.longitude)
+                setIcon(ImageProvider.fromResource(context, com.example.navigation.R.drawable.ic_me))
+            }
+            setCameraPosition(latitude, longitude)
         }
 
-        setCameraPosition(latitude, longitude)
+        if (showResults){
+            placemark = mapView.map.mapObjects.addPlacemark().apply {
+                geometry = Point(Mapkit.latitude, Mapkit.longitude)
+                setIcon(ImageProvider.fromResource(context, com.example.navigation.R.drawable.empty))
+            }
+        }
+
+
         mapView.map.addTapListener(tapListener)
 //        mapView.map.addInputListener(inputListener)
     }

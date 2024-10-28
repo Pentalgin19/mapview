@@ -51,8 +51,12 @@ class Mapkit(
     val searchEditText: EditText
 ) : UserLocationObjectListener,
     Session.SearchListener, CameraListener, DrivingSession.DrivingRouteListener {
-    var latitude: Double = 0.0000
-    var longitude: Double = 0.0000
+    companion object{
+        @JvmStatic
+        var latitude: Double = 0.0000
+        @JvmStatic
+        var longitude: Double = 0.0000
+    }
     val mapView = mapView
 
     val mapkit = MapKitFactory.getInstance()
@@ -131,27 +135,13 @@ class Mapkit(
     }
 
     override fun onObjectAdded(userLocationView: UserLocationView) {
+        val eee = EeE(context, mapView)
+        eee.setPoint(latitude, longitude, true)
         locationMapkit.setAnchor(
             PointF((mapView.width * 0.5).toFloat(), (mapView.height * 0.5).toFloat()),
             PointF((mapView.width * 0.5).toFloat(), (mapView.height * 0.83).toFloat())
         )
-        userLocationView.arrow.setIcon(ImageProvider.fromResource(context, R.drawable.ic_me))
-        val picIcon = userLocationView.pin.useCompositeIcon()
-        picIcon.setIcon(
-            "icon", ImageProvider.fromResource(context, R.drawable.ic_me),
-            IconStyle().setAnchor(PointF(0f, 0f)).setRotationType(RotationType.ROTATE)
-                .setZIndex(0f).setScale(1f)
-        )
-        picIcon.setIcon(
-            "pin",
-            ImageProvider.fromResource(
-                context,
-                R.drawable.ic_pin
-            ),
-            IconStyle().setAnchor(PointF(0.5f, 0.5f)).setRotationType(RotationType.ROTATE)
-                .setZIndex(1f).setScale(0.5f)
-        )
-        userLocationView.accuracyCircle.fillColor = Color.BLUE
+        userLocationView.accuracyCircle.fillColor = Color.TRANSPARENT
     }
 
     override fun onObjectRemoved(p0: UserLocationView) {

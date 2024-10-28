@@ -102,6 +102,8 @@ public class MainActivity2 extends Activity {
         binding.btnShowRoute.setOnClickListener(v -> {
             mapkit.setRoute();
         });
+
+        mapkit.requestLocationPermission();
     }
 
     @Override
@@ -128,11 +130,11 @@ public class MainActivity2 extends Activity {
 
         @Override
         public void onLocationChanged(Location location) {
-            mapkit.setLatitude(location.getLatitude());
-            mapkit.setLongitude(location.getLongitude());
+            Mapkit.setLatitude(location.getLatitude());
+            Mapkit.setLongitude(location.getLongitude());
             if (showWhereIAM){
                 EeE eee = new EeE(MainActivity2.this, mapView);
-                eee.setPoint(location.getLatitude(), location.getLongitude());
+                eee.setPoint(location.getLatitude(), location.getLongitude(), false);
                 showWhereIAM=false;
             }
         }
