@@ -58,6 +58,7 @@ class Mapkit(
         var longitude: Double = 0.0000
     }
     val mapView = mapView
+    private var eee: EeE = EeE(context, mapView)
 
     val mapkit = MapKitFactory.getInstance()
     val trafficJams = mapkit.createTrafficLayer(mapView.mapWindow)
@@ -78,8 +79,7 @@ class Mapkit(
     private var drivingSession: DrivingSession? = null
 
     fun loc() {
-        val eee = EeE(context, mapView)
-        eee.setPoint(latitude, longitude, false)
+        eee.showHide(false)
         locationMapkit.isVisible = true
         locationMapkit.setObjectListener(this)
         searchManager = SearchFactory.getInstance().createSearchManager(SearchManagerType.COMBINED)
@@ -113,8 +113,8 @@ class Mapkit(
                 this
             )
             e = false
+            Toast.makeText(context, "try to get your current gps", Toast.LENGTH_SHORT).show()
         }
-        Toast.makeText(context, "try to get your current gps", Toast.LENGTH_SHORT).show()
     }
 
     fun requestLocationPermission() {
@@ -140,7 +140,7 @@ class Mapkit(
         locationMapkit.setAnchor(
             PointF((mapView.width * 0.5).toFloat(), (mapView.height * 0.5).toFloat()),
             PointF((mapView.width * 0.5).toFloat(), (mapView.height * 0.83).toFloat())
-        )
+        )//maybe it need delete
         userLocationView.accuracyCircle.fillColor = Color.TRANSPARENT
     }
 
@@ -158,10 +158,7 @@ class Mapkit(
             val resultLocation = searchResult.obj!!.geometry[0].point!!
             mapObjectListener.addPlacemark(
                 resultLocation,
-                ImageProvider.fromResource(
-                    context,
-                    R.drawable.ic_pin
-                )
+                ImageProvider.fromResource(context, com.yandex.maps.mobile.R.drawable.search_layer_pin_icon_default)
             )
 
         }

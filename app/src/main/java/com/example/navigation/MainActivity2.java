@@ -105,13 +105,14 @@ public class MainActivity2 extends Activity {
         //if your gps off
         locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
         enabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
-        if (!enabled){
+        if (!enabled) {
             Toast.makeText(this, "turn on your gps", Toast.LENGTH_LONG).show();
         }
 
+        EeE eee = new EeE(MainActivity2.this, mapView);
         binding.btnShowMyPosition.setOnClickListener(v -> {
-            EeE eee = new EeE(MainActivity2.this, mapView);
-            eee.setPoint(lat, lon, true);
+            eee.setCameraPosition(lat, lon);
+            eee.showHide(true);
         });
 
         binding.btnShowRoute.setOnClickListener(v -> {
@@ -145,15 +146,16 @@ public class MainActivity2 extends Activity {
 
         @Override
         public void onLocationChanged(Location location) {
-            if (enabled){
+            if (enabled) {
                 lat = location.getLatitude();
                 lon = location.getLongitude();
                 Mapkit.setLatitude(location.getLatitude());
                 Mapkit.setLongitude(location.getLongitude());
-                if (showWhereIAM){
+                if (showWhereIAM) {
                     EeE eee = new EeE(MainActivity2.this, mapView);
-                    eee.setPoint(location.getLatitude(), location.getLongitude(), false);
-                    showWhereIAM=false;
+                    eee.setCameraPosition(lat, lon);
+                    eee.showHide(true);
+                    showWhereIAM = false;
                 }
             }
         }
