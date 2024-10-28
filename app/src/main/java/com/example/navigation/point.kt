@@ -39,9 +39,9 @@ import com.yandex.runtime.network.RemoteError
 
 
 class EeE(context: Context, mapView: MapView) {
-    val mapView = mapView
+    private val mapView = mapView
     val finalTarget = Point(51.768996, 55.100944)
-    val context = context
+    private val context = context
     companion object{
         @JvmStatic var latitude = 0.000
         @JvmStatic var longitude = 0.000
@@ -56,7 +56,7 @@ class EeE(context: Context, mapView: MapView) {
         mapView.map.addInputListener(inputListener)
         var placemark: PlacemarkMapObject = mapView.map.mapObjects.addPlacemark().apply {
             geometry = Point(Mapkit.latitude, Mapkit.longitude)
-            setIcon(ImageProvider.fromResource(context, com.example.navigation.R.drawable.ic_me))
+            setIcon(ImageProvider.fromResource(context, R.drawable.ic_me))
         }
         if (!showResults){
             placemark.setIconStyle(
@@ -72,12 +72,14 @@ class EeE(context: Context, mapView: MapView) {
                     visible = true
                 }
             )
-            setCameraPosition(latitude, longitude)
         }
+        setCameraPosition(latitude, longitude)
 
 
 //        mapView.map.addInputListener(inputListener)
     }
+
+
 
     fun setCameraPosition(latitude: Double, longitude: Double) {
         val geo = Geometry()
@@ -178,7 +180,71 @@ class EeE(context: Context, mapView: MapView) {
                     ?.firstOrNull { it.kinds.contains(Address.Component.Kind.COUNTRY) }
                     ?.name
                 ?:
-                "я ваще хз"
+                response.collection.children.firstOrNull()?.obj
+                    ?.metadataContainer
+                    ?.getItem(ToponymObjectMetadata::class.java)
+                    ?.address
+                    ?.components
+                    ?.firstOrNull { it.kinds.contains(Address.Component.Kind.LOCALITY) }
+                    ?.name
+                ?:
+                response.collection.children.firstOrNull()?.obj
+                    ?.metadataContainer
+                    ?.getItem(ToponymObjectMetadata::class.java)
+                    ?.address
+                    ?.components
+                    ?.firstOrNull { it.kinds.contains(Address.Component.Kind.OTHER) }
+                    ?.name
+                ?:
+                response.collection.children.firstOrNull()?.obj
+                    ?.metadataContainer
+                    ?.getItem(ToponymObjectMetadata::class.java)
+                    ?.address
+                    ?.components
+                    ?.firstOrNull { it.kinds.contains(Address.Component.Kind.HYDRO) }
+                    ?.name
+                ?:
+                response.collection.children.firstOrNull()?.obj
+                    ?.metadataContainer
+                    ?.getItem(ToponymObjectMetadata::class.java)
+                    ?.address
+                    ?.components
+                    ?.firstOrNull { it.kinds.contains(Address.Component.Kind.AIRPORT) }
+                    ?.name
+                ?:
+                response.collection.children.firstOrNull()?.obj
+                    ?.metadataContainer
+                    ?.getItem(ToponymObjectMetadata::class.java)
+                    ?.address
+                    ?.components
+                    ?.firstOrNull { it.kinds.contains(Address.Component.Kind.VEGETATION) }
+                    ?.name
+                ?:
+                response.collection.children.firstOrNull()?.obj
+                    ?.metadataContainer
+                    ?.getItem(ToponymObjectMetadata::class.java)
+                    ?.address
+                    ?.components
+                    ?.firstOrNull { it.kinds.contains(Address.Component.Kind.METRO_STATION) }
+                    ?.name
+                ?:
+                response.collection.children.firstOrNull()?.obj
+                    ?.metadataContainer
+                    ?.getItem(ToponymObjectMetadata::class.java)
+                    ?.address
+                    ?.components
+                    ?.firstOrNull { it.kinds.contains(Address.Component.Kind.PROVINCE) }
+                    ?.name
+                ?:
+                response.collection.children.firstOrNull()?.obj
+                    ?.metadataContainer
+                    ?.getItem(ToponymObjectMetadata::class.java)
+                    ?.address
+                    ?.components
+                    ?.firstOrNull { it.kinds.contains(Address.Component.Kind.RAILWAY_STATION) }
+                    ?.name
+                ?:
+                "я ваще хз что это"
             val polyline = Polyline()
             Toast.makeText(context, place, Toast.LENGTH_SHORT).show()
         }
@@ -204,7 +270,7 @@ class EeE(context: Context, mapView: MapView) {
             searchSession1 = searchManager.submit(point, 20, SearchOptions(), searchListener)
             val placemark = mapView.map.mapObjects.addPlacemark().apply {
                 geometry = Point(Mapkit.latitude, Mapkit.longitude)
-                setIcon(ImageProvider.fromResource(context, com.example.navigation.R.drawable.ic_pin))
+                setIcon(ImageProvider.fromResource(context, R.drawable.ic_pin))
             }
             Toast.makeText(context, "point", Toast.LENGTH_SHORT).show()
         }
@@ -219,7 +285,6 @@ class EeE(context: Context, mapView: MapView) {
             mapView.map.selectGeoObject(selectionMetadata)
             latitude = geoObjectTapEvent.geoObject.geometry[0].point!!.latitude
             longitude = geoObjectTapEvent.geoObject.geometry[0].point!!.longitude
-            Toast.makeText(context, latitude.toString() + " " + longitude.toString(), Toast.LENGTH_SHORT).show()
             return false
         }
     }
@@ -241,7 +306,7 @@ class EeE(context: Context, mapView: MapView) {
 
     fun q() {
         mapView!!.map.addCameraListener(cameraPosition)
-        editText.setOnEditorActionListener(OnEditorActionListener { textView, actionId, keyEvent ->
+        editText.setOnEditorActionListener(OnEditorActionListener { _, actionId, _ ->
             if (actionId == EditorInfo.IME_ACTION_SEARCH) {
                 submitQuery(editText.text.toString())
             }
@@ -262,7 +327,7 @@ class EeE(context: Context, mapView: MapView) {
             val mapObjects = mapView!!.mapWindow.map.mapObjects
             mapObjects.clear()
             val searchResultImageProvider =
-                ImageProvider.fromResource(context, com.example.navigation.R.drawable.ic_pin)
+                ImageProvider.fromResource(context, R.drawable.ic_pin)
             for (searchResult in p0.collection.children) {
                 val resultLocation = searchResult.obj!!.geometry[0].point
                 if (resultLocation != null) {

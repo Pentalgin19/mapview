@@ -103,13 +103,18 @@ class Mapkit(
         }
     }
 
+    var e = true
     fun submitQuery(query: String) {
-        session = searchManager.submit(
-            query,
-            VisibleRegionUtils.toPolygon(mapView.mapWindow.map.visibleRegion),
-            SearchOptions(),
-            this
-        )
+        if (e){
+            session = searchManager.submit(
+                query,
+                VisibleRegionUtils.toPolygon(mapView.mapWindow.map.visibleRegion),
+                SearchOptions(),
+                this
+            )
+            e = false
+        }
+        Toast.makeText(context, "try to get your current gps", Toast.LENGTH_SHORT).show()
     }
 
     fun requestLocationPermission() {
@@ -129,11 +134,6 @@ class Mapkit(
             return
         }
 
-    }
-
-    fun showWhereIAm() {
-        val l = mapkit.createUserLocationLayer(mapView.mapWindow)
-        l.isVisible = true
     }
 
     override fun onObjectAdded(userLocationView: UserLocationView) {

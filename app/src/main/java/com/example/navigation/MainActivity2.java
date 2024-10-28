@@ -76,6 +76,7 @@ public class MainActivity2 extends Activity {
         mapkit = new Mapkit(mapView, this, this, binding.edSearch);
         binding.btnShowResults.setOnClickListener(v -> {
             if (search != null) {
+                mapkit.setE(true);
                 mapkit.loc();
             }
         });
