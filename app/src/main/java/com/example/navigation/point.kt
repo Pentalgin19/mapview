@@ -18,6 +18,7 @@ import com.yandex.mapkit.map.CameraListener
 import com.yandex.mapkit.map.CameraPosition
 import com.yandex.mapkit.map.CameraUpdateReason
 import com.yandex.mapkit.map.GeoObjectSelectionMetadata
+import com.yandex.mapkit.map.IconStyle
 import com.yandex.mapkit.map.InputListener
 import com.yandex.mapkit.map.Map
 import com.yandex.mapkit.map.PlacemarkMapObject
@@ -51,24 +52,30 @@ class EeE(context: Context, mapView: MapView) {
             Point(latitude, longitude),
             20f
         )
-        var placemark: PlacemarkMapObject
+        mapView.map.addTapListener(tapListener)
+        mapView.map.addInputListener(inputListener)
+        var placemark: PlacemarkMapObject = mapView.map.mapObjects.addPlacemark().apply {
+            geometry = Point(Mapkit.latitude, Mapkit.longitude)
+            setIcon(ImageProvider.fromResource(context, com.example.navigation.R.drawable.ic_me))
+        }
         if (!showResults){
-            placemark = mapView.map.mapObjects.addPlacemark().apply {
-                geometry = Point(Mapkit.latitude, Mapkit.longitude)
-                setIcon(ImageProvider.fromResource(context, com.example.navigation.R.drawable.ic_me))
-            }
-            setCameraPosition(latitude, longitude)
+            placemark.setIconStyle(
+                IconStyle().apply {
+                    visible = false
+                }
+            )
         }
 
         if (showResults){
-            placemark = mapView.map.mapObjects.addPlacemark().apply {
-                geometry = Point(Mapkit.latitude, Mapkit.longitude)
-                setIcon(ImageProvider.fromResource(context, com.example.navigation.R.drawable.empty))
-            }
+            placemark.setIconStyle(
+                IconStyle().apply {
+                    visible = true
+                }
+            )
+            setCameraPosition(latitude, longitude)
         }
 
 
-        mapView.map.addTapListener(tapListener)
 //        mapView.map.addInputListener(inputListener)
     }
 
@@ -131,15 +138,49 @@ class EeE(context: Context, mapView: MapView) {
 
     private val searchListener = object : Session.SearchListener {
         override fun onSearchResponse(response: Response) {
-            val street = response.collection.children.firstOrNull()?.obj
+            val place = response.collection.children.firstOrNull()?.obj
                 ?.metadataContainer
                 ?.getItem(ToponymObjectMetadata::class.java)
                 ?.address
                 ?.components
                 ?.firstOrNull { it.kinds.contains(Address.Component.Kind.HOUSE) }
-                ?.name ?: "Информация об улице не найдена"
+                ?.name
+                ?:
+                response.collection.children.firstOrNull()?.obj
+                ?.metadataContainer
+                ?.getItem(ToponymObjectMetadata::class.java)
+                ?.address
+                ?.components
+                ?.firstOrNull { it.kinds.contains(Address.Component.Kind.STREET) }
+                ?.name
+                ?:
+                response.collection.children.firstOrNull()?.obj
+                    ?.metadataContainer
+                    ?.getItem(ToponymObjectMetadata::class.java)
+                    ?.address
+                    ?.components
+                    ?.firstOrNull { it.kinds.contains(Address.Component.Kind.AREA) }
+                    ?.name
+                ?:
+                response.collection.children.firstOrNull()?.obj
+                    ?.metadataContainer
+                    ?.getItem(ToponymObjectMetadata::class.java)
+                    ?.address
+                    ?.components
+                    ?.firstOrNull { it.kinds.contains(Address.Component.Kind.REGION) }
+                    ?.name
+                ?:
+                response.collection.children.firstOrNull()?.obj
+                    ?.metadataContainer
+                    ?.getItem(ToponymObjectMetadata::class.java)
+                    ?.address
+                    ?.components
+                    ?.firstOrNull { it.kinds.contains(Address.Component.Kind.COUNTRY) }
+                    ?.name
+                ?:
+                "я ваще хз"
             val polyline = Polyline()
-            Toast.makeText(context, street, Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, place, Toast.LENGTH_SHORT).show()
         }
 
         override fun onSearchError(p0: Error) {
@@ -157,7 +198,16 @@ class EeE(context: Context, mapView: MapView) {
 
         }
 
-        override fun onMapLongTap(map: Map, point: Point) {}
+        override fun onMapLongTap(map: Map, point: Point) {
+            val searchManager =
+                SearchFactory.getInstance().createSearchManager(SearchManagerType.COMBINED)
+            searchSession1 = searchManager.submit(point, 20, SearchOptions(), searchListener)
+            val placemark = mapView.map.mapObjects.addPlacemark().apply {
+                geometry = Point(Mapkit.latitude, Mapkit.longitude)
+                setIcon(ImageProvider.fromResource(context, com.example.navigation.R.drawable.ic_pin))
+            }
+            Toast.makeText(context, "point", Toast.LENGTH_SHORT).show()
+        }
     }
 
     private val tapListener = object : GeoObjectTapListener {

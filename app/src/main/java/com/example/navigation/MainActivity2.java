@@ -3,6 +3,7 @@ package com.example.navigation;
 import java.util.Date;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
@@ -57,6 +58,9 @@ public class MainActivity2 extends Activity {
     private Session searchSession;
     private Mapkit mapkit;
     private Boolean showWhereIAM = true;
+    private boolean enabled;
+    private Double lat = 0.00000;
+    private Double lon = 0.00000;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -97,7 +101,17 @@ public class MainActivity2 extends Activity {
             }
         });
 
+        //if your gps off
         locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
+        enabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
+        if (!enabled){
+            Toast.makeText(this, "turn on your gps", Toast.LENGTH_LONG).show();
+        }
+
+        binding.btnShowMyPosition.setOnClickListener(v -> {
+            EeE eee = new EeE(MainActivity2.this, mapView);
+            eee.setPoint(lat, lon, true);
+        });
 
         binding.btnShowRoute.setOnClickListener(v -> {
             mapkit.setRoute();
@@ -130,12 +144,16 @@ public class MainActivity2 extends Activity {
 
         @Override
         public void onLocationChanged(Location location) {
-            Mapkit.setLatitude(location.getLatitude());
-            Mapkit.setLongitude(location.getLongitude());
-            if (showWhereIAM){
-                EeE eee = new EeE(MainActivity2.this, mapView);
-                eee.setPoint(location.getLatitude(), location.getLongitude(), false);
-                showWhereIAM=false;
+            if (enabled){
+                lat = location.getLatitude();
+                lon = location.getLongitude();
+                Mapkit.setLatitude(location.getLatitude());
+                Mapkit.setLongitude(location.getLongitude());
+                if (showWhereIAM){
+                    EeE eee = new EeE(MainActivity2.this, mapView);
+                    eee.setPoint(location.getLatitude(), location.getLongitude(), false);
+                    showWhereIAM=false;
+                }
             }
         }
 

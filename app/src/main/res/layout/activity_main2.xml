@@ -1,44 +1,62 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:padding="5dp">
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal">
-        <Button
-            android:id="@+id/btnShowResults"
-            android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        android:orientation="vertical">
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/show_results"/>
-        <Button
-            android:id="@+id/btnShowTrafficJams"
-            android:layout_width="wrap_content"
+            android:orientation="horizontal">
+            <Button
+                android:id="@+id/btnShowResults"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/show_results"/>
+            <Button
+                android:id="@+id/btnShowTrafficJams"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/show_traffic_jams"/>
+            <Button
+                android:id="@+id/btnShowRoute"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/show_route"/>
+        </LinearLayout>
+
+        <EditText
+            android:id="@+id/edSearch"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/show_traffic_jams"/>
-        <Button
-            android:id="@+id/btnShowRoute"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/show_route"/>
+            android:hint="@string/location_settings"
+            android:minHeight="48dp"
+            android:imeOptions="actionSearch"
+            android:inputType="text"
+            android:maxLines="1"/>
+
+        <com.yandex.mapkit.mapview.MapView
+            android:id="@+id/mapView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>
     </LinearLayout>
-
-    <EditText
-        android:id="@+id/edSearch"
-        android:layout_width="match_parent"
+    <androidx.cardview.widget.CardView
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:hint="@string/location_settings"
-        android:minHeight="48dp"
-        android:imeOptions="actionSearch"
-        android:inputType="text"
-        android:maxLines="1"/>
-
-    <com.yandex.mapkit.mapview.MapView
-        android:id="@+id/mapView"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
-</LinearLayout>
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+        <Button
+            android:id="@+id/btnShowMyPosition"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/show_my_position"
+            />
+    </androidx.cardview.widget.CardView>
+</androidx.constraintlayout.widget.ConstraintLayout>

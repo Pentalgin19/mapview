@@ -78,6 +78,8 @@ class Mapkit(
     private var drivingSession: DrivingSession? = null
 
     fun loc() {
+        val eee = EeE(context, mapView)
+        eee.setPoint(latitude, longitude, false)
         locationMapkit.isVisible = true
         locationMapkit.setObjectListener(this)
         searchManager = SearchFactory.getInstance().createSearchManager(SearchManagerType.COMBINED)
@@ -135,8 +137,6 @@ class Mapkit(
     }
 
     override fun onObjectAdded(userLocationView: UserLocationView) {
-        val eee = EeE(context, mapView)
-        eee.setPoint(latitude, longitude, true)
         locationMapkit.setAnchor(
             PointF((mapView.width * 0.5).toFloat(), (mapView.height * 0.5).toFloat()),
             PointF((mapView.width * 0.5).toFloat(), (mapView.height * 0.83).toFloat())
@@ -204,6 +204,7 @@ class Mapkit(
         val drivingOptions = DrivingOptions()
         val vehicleOptions = VehicleOptions()
         var requestPoints: ArrayList<RequestPoint> = ArrayList()
+        requestPoints.clear()
         requestPoints.add(RequestPoint(routeStartLocation, RequestPointType.WAYPOINT, null, null))
         requestPoints.add(RequestPoint(routeEndLocation, RequestPointType.WAYPOINT, null, null))
         drivingSession =
@@ -211,6 +212,7 @@ class Mapkit(
     }
 
     fun setRoute() {
+        mapObjects?.clear()
         routeEndLocation = com.yandex.mapkit.geometry.Point(EeE.latitude, EeE.longitude)
         routeStartLocation = com.yandex.mapkit.geometry.Point(latitude, longitude)
         drivingRouter =
