@@ -58,18 +58,21 @@ class Mapkit(
     mapView: MapView, val context: Context, val activity: Activity,
     val searchEditText: EditText
 ) : UserLocationObjectListener,
-    Session.SearchListener, CameraListener, DrivingSession.DrivingRouteListener {
+    Session.SearchListener, CameraListener {
     companion object {
         @JvmStatic
         var latitude: Double = 0.0000
 
         @JvmStatic
         var longitude: Double = 0.0000
+
+        @JvmStatic
+        var type = 0
     }
 
     private val mapView = mapView
     private var eee: EeE = EeE(context, mapView)
-    private lateinit var mtRouter: MasstransitRouter
+    private val route = Route(mapView, context)
 
     private val mapkit = MapKitFactory.getInstance()
     private val trafficJams = mapkit.createTrafficLayer(mapView.mapWindow)
@@ -192,121 +195,15 @@ class Mapkit(
 
     }
 
-    override fun onDrivingRoutes(p0: MutableList<DrivingRoute>) {
-        for (route in p0) {
-            mapObjects!!.addPolyline(route.geometry)
-        }
-    }
-
-    override fun onDrivingRoutesError(p0: Error) {
-        val error = "unknown error"
-        Toast.makeText(context, error, Toast.LENGTH_SHORT).show()
-    }
-
-    private fun submitRequest() {
-        val drivingOptions = DrivingOptions()
-        val vehicleOptions = VehicleOptions()
-        var requestPoints: ArrayList<RequestPoint> = ArrayList()
-        requestPoints.clear()
-        requestPoints.add(RequestPoint(routeStartLocation, RequestPointType.WAYPOINT, null, null))
-        requestPoints.add(RequestPoint(routeEndLocation, RequestPointType.WAYPOINT, null, null))
-        drivingSession =
-            drivingRouter!!.requestRoutes(requestPoints, drivingOptions, vehicleOptions, this)
-    }
-
-    fun setCarRoute() {
-        mapView.mapWindow.map.mapObjects.clear()
-        routeEndLocation = com.yandex.mapkit.geometry.Point(EeE.latitude, EeE.longitude)
-        routeStartLocation = com.yandex.mapkit.geometry.Point(latitude, longitude)
-        drivingRouter =
-            DirectionsFactory.getInstance().createDrivingRouter(DrivingRouterType.COMBINED)
-        mapObjects = mapView.map.mapObjects.addCollection()
-
-        submitRequest()
+    fun setCarRoute(){
+        eee.setPoint(latitude, longitude)
+        eee.setSelectedPoint(EeE.selectedPointLatitude, EeE.selectedPointLongitude)
+        route.setCarRoute()
     }
 
     fun setWalkingRoute(){
-        val transitOptions = TransitOptions(FilterVehicleTypes.NONE.value, TimeOptions())
-        val avoidSteep = false
-        val routeOptions = RouteOptions(FitnessOptions(avoidSteep))
-        val points: MutableList<RequestPoint> = ArrayList()
-        mapView.mapWindow.map.mapObjects.clear()
-        points.clear()
-        points.add(
-            RequestPoint(
-                Point(latitude, longitude), RequestPointType.WAYPOINT, null, null
-            )
-        )
-        points.add(
-            RequestPoint(
-                Point(EeE.latitude, EeE.longitude), RequestPointType.WAYPOINT, null, null
-            )
-        )
-        mtRouter = TransportFactory.getInstance().createMasstransitRouter()
-        mtRouter.requestRoutes(points, transitOptions, routeOptions, masstransitRouter)
-    }
-
-    private fun drawSection(data: SectionData, geometry: Polyline) {
-        val polylineMapObject = mapView.map.mapObjects.addPolyline(geometry)
-        if (data.transports != null) {
-            for (transport in data.transports!!) {
-                if (transport.line.style != null) {
-                    transport.line.style!!.color?.or(-0x1000000)
-                    return
-                }
-            }
-            val knownVehicleTypes = HashSet<String>()
-            knownVehicleTypes.add("bus")
-            knownVehicleTypes.add("tramway")
-            for (transport in data.transports!!) {
-                val sectionVehicleType = getVehicleType(transport, knownVehicleTypes)
-                if (sectionVehicleType == "bus") {
-                    polylineMapObject.setStrokeColor(-0xff0100) // Green
-                    return
-                } else if (sectionVehicleType == "tramway") {
-                    polylineMapObject.setStrokeColor(-0x10000) // Red
-                    return
-                }
-            }
-//            polylineMapObject.setStrokeColor(-0xffff01) // Blue
-        } else {
-            polylineMapObject.setStrokeColor(-0x1000000) // Black
-        }
-    }
-
-    private fun getVehicleType(transport: Transport, knownVehicleTypes: HashSet<String>): String? {
-        for (type in transport.line.vehicleTypes) {
-            if (knownVehicleTypes.contains(type)) {
-                return type
-            }
-        }
-        return null
-    }
-
-    private val masstransitRouter = object : RouteListener {
-        override fun onMasstransitRoutes(p0: MutableList<Route>) {
-            if (p0.size > 0) {
-                for (section in p0[0].sections) {
-                    drawSection(
-                        section.metadata.data,
-                        SubpolylineHelper.subpolyline(
-                            p0[0].geometry, section.geometry
-                        )
-                    )
-                }
-            }
-        }
-
-        override fun onMasstransitRoutesError(error: Error) {
-            var errorMessage: String? = "unknown error message"
-            if (error is RemoteError) {
-                errorMessage = "remote error message"
-            } else if (error is NetworkError) {
-                errorMessage = "network error message"
-            }
-
-            Toast.makeText(context, errorMessage, Toast.LENGTH_SHORT).show()
-        }
-
+        eee.setPoint(latitude, longitude)
+        eee.setSelectedPoint(EeE.selectedPointLatitude, EeE.selectedPointLongitude)
+        route.setWalkingRoute()
     }
 }

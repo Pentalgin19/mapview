@@ -17,11 +17,13 @@ import android.view.KeyEvent;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.SearchView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.app.ActivityCompat;
 
 import com.example.navigation.databinding.ActivityMain2Binding;
@@ -48,15 +50,15 @@ import com.yandex.runtime.network.RemoteError;
 
 public class MainActivity2 extends Activity {
 
-    private Button btnShowTrafficJams;
+    private ImageButton btnShowTrafficJams;
 
     private LocationManager locationManager;
     private ActivityMain2Binding binding;
     private MapView mapView;
-    private String search;
+    private String search = null;
     private SearchManager searchManager;
     private Session searchSession;
-    private Mapkit mapkit;
+    public Mapkit mapkit;
     private Boolean showWhereIAM = true;
     private boolean enabled;
     private Double lat = 0.00000;
@@ -81,9 +83,15 @@ public class MainActivity2 extends Activity {
         eee.addTapAndInputListener();
 
         binding.btnShowResults.setOnClickListener(v -> {
-            if (search != null) {
+            if (search != null && !search.isEmpty()) {
                 mapkit.setE(true);
                 mapkit.loc();
+            }else{
+                if (binding.searchBar.getVisibility() == View.VISIBLE){
+                    binding.searchBar.setVisibility(View.GONE);
+                }else{
+                    binding.searchBar.setVisibility(View.VISIBLE);
+                }
             }
         });
 
@@ -119,6 +127,8 @@ public class MainActivity2 extends Activity {
             eee.setCameraPosition(lat, lon);
             eee.showHide(true);
         });
+
+        Route route = new Route(mapView, this);
 
         binding.btnShowWalkingRoute.setOnClickListener(v -> {
             mapkit.setWalkingRoute();

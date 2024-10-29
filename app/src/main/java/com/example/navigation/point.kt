@@ -1,5 +1,6 @@
 package com.example.navigation
 
+import android.app.Activity
 import android.content.Context
 import android.view.View
 import android.view.inputmethod.EditorInfo
@@ -55,9 +56,18 @@ class EeE(context: Context, mapView: MapView) {
 
         @JvmStatic
         var longitude = 0.000
+
+        @JvmStatic
+        var selectedPointLatitude = 0.0000
+
+        @JvmStatic
+        var selectedPointLongitude: Double = 0.00000
     }
 
-    private lateinit var placemark: PlacemarkMapObject
+    private var placemark = mapView.map.mapObjects.addPlacemark().apply {
+        geometry = Point(latitude, longitude)
+        setIcon(ImageProvider.fromResource(context, R.drawable.selected_location))
+    }
 
     fun setPoint(latitude: Double, longitude: Double) {
         mapView.mapWindow.map.mapObjects.clear()
@@ -250,8 +260,7 @@ class EeE(context: Context, mapView: MapView) {
                 Toast.makeText(context, place, Toast.LENGTH_SHORT).show()
             }else if (country != ""){
                 Toast.makeText(context, country, Toast.LENGTH_SHORT).show()
-            }
-            if (hydro != ""){
+            }else if (hydro != ""){
                 Toast.makeText(context, hydro, Toast.LENGTH_SHORT).show()
             }
             val polyline = Polyline()
@@ -260,8 +269,8 @@ class EeE(context: Context, mapView: MapView) {
         override fun onSearchError(p0: Error) {
         }
     }
-
     lateinit var searchSession1: Session
+    private val route = Route(mapView, context)
 
     private val inputListener = object : InputListener {
         override fun onMapTap(map: Map, point: Point) {
@@ -271,16 +280,33 @@ class EeE(context: Context, mapView: MapView) {
         }
 
         override fun onMapLongTap(map: Map, point: Point) {
+            selectedPointLatitude = point.latitude
+            selectedPointLongitude = point.longitude
+            mapView.mapWindow.map.mapObjects.clear()
+            setPoint(Mapkit.latitude, Mapkit.longitude)
+
+            if (Mapkit.type == 1){
+                route.setWalkingRoute()
+            }else if (Mapkit.type == 2){
+                route.setCarRoute()
+            }
+
             val searchManager =
                 SearchFactory.getInstance().createSearchManager(SearchManagerType.COMBINED)
             searchSession1 = searchManager.submit(point, 20, SearchOptions(), searchListener)
-            val placemark = mapView.map.mapObjects.addPlacemark().apply {
-                geometry = Point(point.latitude, point.longitude)
-                setIcon(ImageProvider.fromResource(context, R.drawable.selected_location))
-            }
+
+            setSelectedPoint(point.latitude, point.longitude)
+
             latitude = placemark.geometry.latitude
             longitude = placemark.geometry.longitude
             cardView.visibility = View.VISIBLE
+        }
+    }
+
+    fun setSelectedPoint(latitude: Double, longitude: Double) {
+        placemark = mapView.map.mapObjects.addPlacemark().apply {
+            geometry = Point(latitude, longitude)
+            setIcon(ImageProvider.fromResource(context, R.drawable.selected_location))
         }
     }
 
