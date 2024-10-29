@@ -4,10 +4,7 @@ import android.app.Activity
 import android.content.Context
 import android.content.pm.PackageManager
 import android.graphics.Color
-import android.graphics.Point
-import android.graphics.PointF
 import android.view.inputmethod.EditorInfo
-import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
@@ -21,15 +18,15 @@ import com.yandex.mapkit.directions.driving.DrivingRouter
 import com.yandex.mapkit.directions.driving.DrivingRouterType
 import com.yandex.mapkit.directions.driving.DrivingSession
 import com.yandex.mapkit.directions.driving.VehicleOptions
+import com.yandex.mapkit.geometry.Point
+import com.yandex.mapkit.geometry.Polyline
+import com.yandex.mapkit.geometry.SubpolylineHelper
 import com.yandex.mapkit.layers.ObjectEvent
-import com.yandex.mapkit.location.Location
 import com.yandex.mapkit.map.CameraListener
 import com.yandex.mapkit.map.CameraPosition
 import com.yandex.mapkit.map.CameraUpdateReason
-import com.yandex.mapkit.map.IconStyle
 import com.yandex.mapkit.map.Map
 import com.yandex.mapkit.map.MapObjectCollection
-import com.yandex.mapkit.map.RotationType
 import com.yandex.mapkit.map.VisibleRegionUtils
 import com.yandex.mapkit.mapview.MapView
 import com.yandex.mapkit.search.Response
@@ -38,7 +35,17 @@ import com.yandex.mapkit.search.SearchManager
 import com.yandex.mapkit.search.SearchManagerType
 import com.yandex.mapkit.search.SearchOptions
 import com.yandex.mapkit.search.Session
-import com.yandex.mapkit.user_location.UserLocationLayer
+import com.yandex.mapkit.transport.TransportFactory
+import com.yandex.mapkit.transport.masstransit.FilterVehicleTypes
+import com.yandex.mapkit.transport.masstransit.FitnessOptions
+import com.yandex.mapkit.transport.masstransit.MasstransitRouter
+import com.yandex.mapkit.transport.masstransit.Route
+import com.yandex.mapkit.transport.masstransit.RouteOptions
+import com.yandex.mapkit.transport.masstransit.SectionMetadata.SectionData
+import com.yandex.mapkit.transport.masstransit.Session.RouteListener
+import com.yandex.mapkit.transport.masstransit.TimeOptions
+import com.yandex.mapkit.transport.masstransit.TransitOptions
+import com.yandex.mapkit.transport.masstransit.Transport
 import com.yandex.mapkit.user_location.UserLocationObjectListener
 import com.yandex.mapkit.user_location.UserLocationView
 import com.yandex.runtime.Error
@@ -46,25 +53,29 @@ import com.yandex.runtime.image.ImageProvider
 import com.yandex.runtime.network.NetworkError
 import com.yandex.runtime.network.RemoteError
 
+
 class Mapkit(
     mapView: MapView, val context: Context, val activity: Activity,
     val searchEditText: EditText
 ) : UserLocationObjectListener,
     Session.SearchListener, CameraListener, DrivingSession.DrivingRouteListener {
-    companion object{
+    companion object {
         @JvmStatic
         var latitude: Double = 0.0000
+
         @JvmStatic
         var longitude: Double = 0.0000
     }
-    val mapView = mapView
-    private var eee: EeE = EeE(context, mapView)
 
-    val mapkit = MapKitFactory.getInstance()
-    val trafficJams = mapkit.createTrafficLayer(mapView.mapWindow)
-    var locationMapkit = mapkit.createUserLocationLayer(mapView.mapWindow)
-    lateinit var searchManager: SearchManager
-    lateinit var session: Session
+    private val mapView = mapView
+    private var eee: EeE = EeE(context, mapView)
+    private lateinit var mtRouter: MasstransitRouter
+
+    private val mapkit = MapKitFactory.getInstance()
+    private val trafficJams = mapkit.createTrafficLayer(mapView.mapWindow)
+    private var locationMapkit = mapkit.createUserLocationLayer(mapView.mapWindow)
+    private lateinit var searchManager: SearchManager
+    private lateinit var session: Session
     private var check = false
 
     private var routeStartLocation = com.yandex.mapkit.geometry.Point(0.0000, 0.000)
@@ -105,7 +116,7 @@ class Mapkit(
 
     var e = true
     fun submitQuery(query: String) {
-        if (e){
+        if (e) {
             session = searchManager.submit(
                 query,
                 VisibleRegionUtils.toPolygon(mapView.mapWindow.map.visibleRegion),
@@ -113,7 +124,6 @@ class Mapkit(
                 this
             )
             e = false
-            Toast.makeText(context, "try to get your current gps", Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -137,10 +147,6 @@ class Mapkit(
     }
 
     override fun onObjectAdded(userLocationView: UserLocationView) {
-        locationMapkit.setAnchor(
-            PointF((mapView.width * 0.5).toFloat(), (mapView.height * 0.5).toFloat()),
-            PointF((mapView.width * 0.5).toFloat(), (mapView.height * 0.83).toFloat())
-        )//maybe it need delete
         userLocationView.accuracyCircle.fillColor = Color.TRANSPARENT
     }
 
@@ -153,12 +159,16 @@ class Mapkit(
     }
 
     override fun onSearchResponse(response: Response) {
+        mapView.map.mapObjects.clear()//работает, но с задержкой
         val mapObjectListener = mapView.map.mapObjects
         for (searchResult in response.collection.children) {
             val resultLocation = searchResult.obj!!.geometry[0].point!!
             mapObjectListener.addPlacemark(
                 resultLocation,
-                ImageProvider.fromResource(context, com.yandex.maps.mobile.R.drawable.search_layer_pin_icon_default)
+                ImageProvider.fromResource(
+                    context,
+                    com.yandex.maps.mobile.R.drawable.search_layer_pin_icon_default
+                )
             )
 
         }
@@ -208,8 +218,8 @@ class Mapkit(
             drivingRouter!!.requestRoutes(requestPoints, drivingOptions, vehicleOptions, this)
     }
 
-    fun setRoute() {
-        mapObjects?.clear()
+    fun setCarRoute() {
+        mapView.mapWindow.map.mapObjects.clear()
         routeEndLocation = com.yandex.mapkit.geometry.Point(EeE.latitude, EeE.longitude)
         routeStartLocation = com.yandex.mapkit.geometry.Point(latitude, longitude)
         drivingRouter =
@@ -217,5 +227,89 @@ class Mapkit(
         mapObjects = mapView.map.mapObjects.addCollection()
 
         submitRequest()
+    }
+    fun setWalkingRoute(){
+        val transitOptions = TransitOptions(FilterVehicleTypes.NONE.value, TimeOptions())
+        val avoidSteep = false
+        val routeOptions = RouteOptions(FitnessOptions(avoidSteep))
+        val points: MutableList<RequestPoint> = ArrayList()
+        mapView.mapWindow.map.mapObjects.clear()
+        points.clear()
+        points.add(
+            RequestPoint(
+                Point(latitude, longitude), RequestPointType.WAYPOINT, null, null
+            )
+        )
+        points.add(
+            RequestPoint(
+                Point(EeE.latitude, EeE.longitude), RequestPointType.WAYPOINT, null, null
+            )
+        )
+        mtRouter = TransportFactory.getInstance().createMasstransitRouter()
+        mtRouter.requestRoutes(points, transitOptions, routeOptions, masstransitRouter)
+    }
+
+    private fun drawSection(data: SectionData, geometry: Polyline) {
+        val polylineMapObject = mapView.map.mapObjects.addPolyline(geometry)
+        if (data.transports != null) {
+            for (transport in data.transports!!) {
+                if (transport.line.style != null) {
+                    transport.line.style!!.color?.or(-0x1000000)
+                    return
+                }
+            }
+            val knownVehicleTypes = HashSet<String>()
+            knownVehicleTypes.add("bus")
+            knownVehicleTypes.add("tramway")
+            for (transport in data.transports!!) {
+                val sectionVehicleType = getVehicleType(transport, knownVehicleTypes)
+                if (sectionVehicleType == "bus") {
+                    polylineMapObject.setStrokeColor(-0xff0100) // Green
+                    return
+                } else if (sectionVehicleType == "tramway") {
+                    polylineMapObject.setStrokeColor(-0x10000) // Red
+                    return
+                }
+            }
+            polylineMapObject.setStrokeColor(-0xffff01) // Blue
+        } else {
+            polylineMapObject.setStrokeColor(-0x1000000) // Black
+        }
+    }
+
+    private fun getVehicleType(transport: Transport, knownVehicleTypes: HashSet<String>): String? {
+        for (type in transport.line.vehicleTypes) {
+            if (knownVehicleTypes.contains(type)) {
+                return type
+            }
+        }
+        return null
+    }
+
+    private val masstransitRouter = object : RouteListener {
+        override fun onMasstransitRoutes(p0: MutableList<Route>) {
+            if (p0.size > 0) {
+                for (section in p0[0].sections) {
+                    drawSection(
+                        section.metadata.data,
+                        SubpolylineHelper.subpolyline(
+                            p0[0].geometry, section.geometry
+                        )
+                    )
+                }
+            }
+        }
+
+        override fun onMasstransitRoutesError(error: Error) {
+            var errorMessage: String? = "unknown error message"
+            if (error is RemoteError) {
+                errorMessage = "remote error message"
+            } else if (error is NetworkError) {
+                errorMessage = "network error message"
+            }
+
+            Toast.makeText(context, errorMessage, Toast.LENGTH_SHORT).show()
+        }
+
     }
 }

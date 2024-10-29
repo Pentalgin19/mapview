@@ -7,30 +7,30 @@
     android:padding="5dp">
     <LinearLayout
         android:layout_width="match_parent"
+
         android:layout_height="match_parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         android:orientation="vertical">
-        <LinearLayout
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal">
             <Button
                 android:id="@+id/btnShowResults"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/show_results"/>
             <Button
                 android:id="@+id/btnShowTrafficJams"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/show_traffic_jams"/>
-            <Button
-                android:id="@+id/btnShowRoute"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/show_route"/>
-        </LinearLayout>
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
         <EditText
             android:id="@+id/edSearch"
@@ -48,15 +48,39 @@
             android:layout_height="match_parent"/>
     </LinearLayout>
     <androidx.cardview.widget.CardView
-        android:layout_width="wrap_content"
+        android:id="@+id/cvShowRoute"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent">
-        <Button
-            android:id="@+id/btnShowMyPosition"
-            android:layout_width="wrap_content"
+        app:layout_constraintStart_toStartOf="parent">
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/show_my_position"
-            />
+            android:orientation="horizontal">
+            <Button
+                android:id="@+id/btnShowCarRoute"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="start"
+                android:layout_weight="0.3"
+                android:text="@string/show_car_route"/>
+            <Button
+                android:id="@+id/btnShowMyPosition"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.3"
+                android:textAlignment="center"
+                android:text="@string/show_my_position" />
+            <Button
+                android:id="@+id/btnShowWalkingRoute"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="end"
+                android:layout_weight="0.3"
+                android:text="@string/show_a_walking_route"/>
+        </LinearLayout>
+
     </androidx.cardview.widget.CardView>
 </androidx.constraintlayout.widget.ConstraintLayout>

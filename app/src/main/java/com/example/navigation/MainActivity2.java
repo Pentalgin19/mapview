@@ -48,7 +48,7 @@ import com.yandex.runtime.network.RemoteError;
 
 public class MainActivity2 extends Activity {
 
-    Button button;
+    private Button btnShowTrafficJams;
 
     private LocationManager locationManager;
     private ActivityMain2Binding binding;
@@ -61,6 +61,7 @@ public class MainActivity2 extends Activity {
     private boolean enabled;
     private Double lat = 0.00000;
     private Double lon = 0.00000;
+    private EeE eee;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,10 +71,15 @@ public class MainActivity2 extends Activity {
         binding = ActivityMain2Binding.inflate(getLayoutInflater());
         View view = binding.getRoot();
         setContentView(view);
-        button = binding.btnShowTrafficJams;
+        btnShowTrafficJams = binding.btnShowTrafficJams;
         searchManager = SearchFactory.getInstance().createSearchManager(SearchManagerType.COMBINED);
         mapView = binding.mapView;
         mapkit = new Mapkit(mapView, this, this, binding.edSearch);
+
+        eee = new EeE(this, mapView);
+        eee.cardView = binding.cvShowRoute;
+        eee.addTapAndInputListener();
+
         binding.btnShowResults.setOnClickListener(v -> {
             if (search != null) {
                 mapkit.setE(true);
@@ -81,7 +87,7 @@ public class MainActivity2 extends Activity {
             }
         });
 
-        button.setOnClickListener(v -> {
+        btnShowTrafficJams.setOnClickListener(v -> {
             mapkit.showTrafficJams();
         });
 
@@ -109,14 +115,17 @@ public class MainActivity2 extends Activity {
             Toast.makeText(this, "turn on your gps", Toast.LENGTH_LONG).show();
         }
 
-        EeE eee = new EeE(MainActivity2.this, mapView);
         binding.btnShowMyPosition.setOnClickListener(v -> {
             eee.setCameraPosition(lat, lon);
             eee.showHide(true);
         });
 
-        binding.btnShowRoute.setOnClickListener(v -> {
-            mapkit.setRoute();
+        binding.btnShowWalkingRoute.setOnClickListener(v -> {
+            mapkit.setWalkingRoute();
+        });
+        
+        binding.btnShowCarRoute.setOnClickListener(v -> {
+            mapkit.setCarRoute();
         });
 
         mapkit.requestLocationPermission();
@@ -157,6 +166,7 @@ public class MainActivity2 extends Activity {
                     eee.showHide(true);
                     showWhereIAM = false;
                 }
+                eee.setPoint(location.getLatitude(), location.getLongitude());
             }
         }
 

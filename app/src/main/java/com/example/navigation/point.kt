@@ -1,10 +1,12 @@
 package com.example.navigation
 
 import android.content.Context
+import android.view.View
 import android.view.inputmethod.EditorInfo
 import android.widget.EditText
 import android.widget.TextView.OnEditorActionListener
 import android.widget.Toast
+import androidx.cardview.widget.CardView
 import com.google.android.material.snackbar.Snackbar
 import com.yandex.mapkit.Animation
 import com.yandex.mapkit.directions.driving.DrivingRoute
@@ -41,6 +43,8 @@ import com.yandex.runtime.network.RemoteError
 
 
 class EeE(context: Context, mapView: MapView) {
+
+    lateinit var cardView: CardView
     private val mapView = mapView
     val finalTarget = Point(51.768996, 55.100944)
     private val context = context
@@ -56,19 +60,20 @@ class EeE(context: Context, mapView: MapView) {
     private lateinit var placemark: PlacemarkMapObject
 
     fun setPoint(latitude: Double, longitude: Double) {
-        val circle = Circle(
-            Point(latitude, longitude),
-            20f
-        )
-        mapView.map.addTapListener(tapListener)
-        mapView.map.addInputListener(inputListener)
+        mapView.mapWindow.map.mapObjects.clear()
         placemark = mapView.map.mapObjects.addPlacemark().apply {
-            geometry = Point(Mapkit.latitude, Mapkit.longitude)
+            geometry = Point(latitude, longitude)
             setIcon(ImageProvider.fromResource(context, R.drawable.ic_me))
         }
     }
 
+    fun addTapAndInputListener(){
+        mapView.map.addTapListener(tapListener)
+        mapView.map.addInputListener(inputListener)
+    }
+
     fun showHide(show: Boolean) {
+        mapView.mapWindow.map.mapObjects.clear()
         placemark = mapView.map.mapObjects.addPlacemark().apply {
             geometry = Point(Mapkit.latitude, Mapkit.longitude)
             setIcon(ImageProvider.fromResource(context, R.drawable.ic_me))
@@ -108,61 +113,23 @@ class EeE(context: Context, mapView: MapView) {
         )
     }
 
-    val drivingRouteListener = object : DrivingSession.DrivingRouteListener {
-        override fun onDrivingRoutes(drivingRoutes: MutableList<DrivingRoute>) {
-            Toast.makeText(context, drivingRoutes.toString(), Toast.LENGTH_SHORT).show()
+    private val tapListener = object : GeoObjectTapListener {
+        override fun onObjectTap(geoObjectTapEvent: GeoObjectTapEvent): Boolean {
+            val selectionMetadata: GeoObjectSelectionMetadata = geoObjectTapEvent
+                .geoObject
+                .metadataContainer
+                .getItem(GeoObjectSelectionMetadata::class.java)
+            mapView.map.selectGeoObject(selectionMetadata)
+            latitude = geoObjectTapEvent.geoObject.geometry[0].point!!.latitude
+            longitude = geoObjectTapEvent.geoObject.geometry[0].point!!.longitude
+            cardView.visibility = View.VISIBLE
+            return false
         }
-
-        override fun onDrivingRoutesError(error: Error) {
-            Toast.makeText(context, "bad", Toast.LENGTH_SHORT).show()
-        }
-    }
-
-    val searchSessionListener = object : Session.SearchListener {
-        override fun onSearchResponse(response: Response) {
-            Toast.makeText(context, response.collection.children.firstOrNull()?.obj
-                ?.metadataContainer
-                ?.getItem(ToponymObjectMetadata::class.java)
-                ?.address
-                ?.components
-                ?.firstOrNull { it.kinds.contains(Address.Component.Kind.STREET) }
-                ?.name
-                ?: "No fuel", Toast.LENGTH_SHORT).show()
-        }
-
-        override fun onSearchError(p0: Error) {
-            Toast.makeText(context, "$p0", Toast.LENGTH_SHORT).show()
-        }
-    }
-
-
-    fun search(request: String) {
-        val searchManager = SearchFactory.getInstance().createSearchManager(
-            SearchManagerType.ONLINE
-        )
-        val point = Geometry.fromPoint(Point(59.95, 30.32))
-        val options = SearchOptions()
-        options.snippets = Snippet.PHOTOS.value
-        val searchSession = searchManager!!.submit(request, point, options, searchSessionListener)
     }
 
     private val searchListener = object : Session.SearchListener {
         override fun onSearchResponse(response: Response) {
             val place = response.collection.children.firstOrNull()?.obj
-                ?.metadataContainer
-                ?.getItem(ToponymObjectMetadata::class.java)
-                ?.address
-                ?.components
-                ?.firstOrNull { it.kinds.contains(Address.Component.Kind.HOUSE) }
-                ?.name
-                ?: response.collection.children.firstOrNull()?.obj
-                    ?.metadataContainer
-                    ?.getItem(ToponymObjectMetadata::class.java)
-                    ?.address
-                    ?.components
-                    ?.firstOrNull { it.kinds.contains(Address.Component.Kind.STREET) }
-                    ?.name
-                ?: response.collection.children.firstOrNull()?.obj
                     ?.metadataContainer
                     ?.getItem(ToponymObjectMetadata::class.java)
                     ?.address
@@ -181,13 +148,6 @@ class EeE(context: Context, mapView: MapView) {
                     ?.getItem(ToponymObjectMetadata::class.java)
                     ?.address
                     ?.components
-                    ?.firstOrNull { it.kinds.contains(Address.Component.Kind.COUNTRY) }
-                    ?.name
-                ?: response.collection.children.firstOrNull()?.obj
-                    ?.metadataContainer
-                    ?.getItem(ToponymObjectMetadata::class.java)
-                    ?.address
-                    ?.components
                     ?.firstOrNull { it.kinds.contains(Address.Component.Kind.LOCALITY) }
                     ?.name
                 ?: response.collection.children.firstOrNull()?.obj
@@ -196,13 +156,6 @@ class EeE(context: Context, mapView: MapView) {
                     ?.address
                     ?.components
                     ?.firstOrNull { it.kinds.contains(Address.Component.Kind.OTHER) }
-                    ?.name
-                ?: response.collection.children.firstOrNull()?.obj
-                    ?.metadataContainer
-                    ?.getItem(ToponymObjectMetadata::class.java)
-                    ?.address
-                    ?.components
-                    ?.firstOrNull { it.kinds.contains(Address.Component.Kind.HYDRO) }
                     ?.name
                 ?: response.collection.children.firstOrNull()?.obj
                     ?.metadataContainer
@@ -239,9 +192,69 @@ class EeE(context: Context, mapView: MapView) {
                     ?.components
                     ?.firstOrNull { it.kinds.contains(Address.Component.Kind.RAILWAY_STATION) }
                     ?.name
-                ?: "я ваще хз что это"
+                ?: ""
+            val country = response.collection.children.firstOrNull()?.obj
+                ?.metadataContainer
+                ?.getItem(ToponymObjectMetadata::class.java)
+                ?.address
+                ?.components
+                ?.firstOrNull { it.kinds.contains(Address.Component.Kind.COUNTRY) }
+                ?.name
+                ?: ""
+            val hydro = response.collection.children.firstOrNull()?.obj
+                ?.metadataContainer
+                ?.getItem(ToponymObjectMetadata::class.java)
+                ?.address
+                ?.components
+                ?.firstOrNull { it.kinds.contains(Address.Component.Kind.HYDRO) }
+                ?.name
+                ?: ""
+            val house = response.collection.children.firstOrNull()?.obj
+                ?.metadataContainer
+                ?.getItem(ToponymObjectMetadata::class.java)
+                ?.address
+                ?.components
+                ?.firstOrNull { it.kinds.contains(Address.Component.Kind.HOUSE) }
+                ?.name
+                ?:  ""
+            val street = response.collection.children.firstOrNull()?.obj
+                ?.metadataContainer
+                ?.getItem(ToponymObjectMetadata::class.java)
+                ?.address
+                ?.components
+                ?.firstOrNull { it.kinds.contains(Address.Component.Kind.STREET) }
+                ?.name
+                ?: ""
+            val city = response.collection.children.firstOrNull()?.obj
+                ?.metadataContainer
+                ?.getItem(ToponymObjectMetadata::class.java)
+                ?.address
+                ?.components
+                ?.firstOrNull { it.kinds.contains(Address.Component.Kind.LOCALITY) }
+                ?.name
+                ?: ""
+
+            if (house != "" && street != ""){
+                Toast.makeText(context, "$street, $house", Toast.LENGTH_SHORT).show()
+            }else if (house != ""){
+                Toast.makeText(context, house, Toast.LENGTH_SHORT).show()
+            }else if (street != ""){
+                Toast.makeText(context, street, Toast.LENGTH_SHORT).show()
+            }else if (city != "" && country != ""){
+                Toast.makeText(context, "$city, $country", Toast.LENGTH_SHORT).show()
+            }else if (city != ""){
+                Toast.makeText(context, city, Toast.LENGTH_SHORT).show()
+            }else if (place != "" && country != ""){
+                Toast.makeText(context, "$place, $country", Toast.LENGTH_SHORT).show()
+            }else if (place != ""){
+                Toast.makeText(context, place, Toast.LENGTH_SHORT).show()
+            }else if (country != ""){
+                Toast.makeText(context, country, Toast.LENGTH_SHORT).show()
+            }
+            if (hydro != ""){
+                Toast.makeText(context, hydro, Toast.LENGTH_SHORT).show()
+            }
             val polyline = Polyline()
-            Toast.makeText(context, place, Toast.LENGTH_SHORT).show()
         }
 
         override fun onSearchError(p0: Error) {
@@ -271,26 +284,12 @@ class EeE(context: Context, mapView: MapView) {
         }
     }
 
-    private val tapListener = object : GeoObjectTapListener {
-        override fun onObjectTap(geoObjectTapEvent: GeoObjectTapEvent): Boolean {
-            val selectionMetadata: GeoObjectSelectionMetadata = geoObjectTapEvent
-                .geoObject
-                .metadataContainer
-                .getItem(GeoObjectSelectionMetadata::class.java)
-            mapView.map.selectGeoObject(selectionMetadata)
-            latitude = geoObjectTapEvent.geoObject.geometry[0].point!!.latitude
-            longitude = geoObjectTapEvent.geoObject.geometry[0].point!!.longitude
-            Toast.makeText(context, "text", Toast.LENGTH_SHORT).show()
-            return false
-        }
-    }
-
     private var searchSession: Session? = null
     lateinit var editText: EditText
 
     private fun submitQuery(query: String) {
         val searchManager = SearchFactory.getInstance().createSearchManager(
-            SearchManagerType.ONLINE
+            SearchManagerType.COMBINED
         )
         searchSession = searchManager.submit(
             query,
@@ -298,24 +297,6 @@ class EeE(context: Context, mapView: MapView) {
             SearchOptions(),
             searchListener1
         )
-    }
-
-    fun q() {
-        mapView!!.map.addCameraListener(cameraPosition)
-        editText.setOnEditorActionListener(OnEditorActionListener { _, actionId, _ ->
-            if (actionId == EditorInfo.IME_ACTION_SEARCH) {
-                submitQuery(editText.text.toString())
-            }
-            false
-        })
-
-        mapView.map.move(
-            CameraPosition(Point(50.5, 14.5), 14.0f, 0.0f, 0.0f),
-            Animation(Animation.Type.LINEAR, 14f),
-            null
-        )
-
-        submitQuery(editText.text.toString())
     }
 
     val searchListener1 = object : Session.SearchListener {

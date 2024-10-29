@@ -31,4 +31,6 @@
     <string name="show_traffic_jams">Show traffic jams</string>
     <string name="show_route">Show route</string>
     <string name="show_my_position">Show my position</string>
+    <string name="show_car_route">Show car route</string>
+    <string name="show_a_walking_route">show a walking route</string>
 </resources>
