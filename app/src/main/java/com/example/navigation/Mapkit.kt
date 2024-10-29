@@ -184,12 +184,8 @@ class Mapkit(
         Toast.makeText(context, errorMessage, Toast.LENGTH_SHORT).show()
     }
 
-    override fun onCameraPositionChanged(
-        map: Map,
-        cameraPosition: CameraPosition,
-        cameraUpdateReason: CameraUpdateReason,
-        finished: Boolean
-    ) {
+    override fun onCameraPositionChanged(map: Map, cameraPosition: CameraPosition,
+        cameraUpdateReason: CameraUpdateReason, finished: Boolean) {
         if (finished) {
             submitQuery(searchEditText.text.toString())
         }
@@ -228,6 +224,7 @@ class Mapkit(
 
         submitRequest()
     }
+
     fun setWalkingRoute(){
         val transitOptions = TransitOptions(FilterVehicleTypes.NONE.value, TimeOptions())
         val avoidSteep = false
@@ -271,7 +268,7 @@ class Mapkit(
                     return
                 }
             }
-            polylineMapObject.setStrokeColor(-0xffff01) // Blue
+//            polylineMapObject.setStrokeColor(-0xffff01) // Blue
         } else {
             polylineMapObject.setStrokeColor(-0x1000000) // Black
         }

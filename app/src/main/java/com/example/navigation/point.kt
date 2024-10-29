@@ -268,8 +268,6 @@ class EeE(context: Context, mapView: MapView) {
             val searchManager =
                 SearchFactory.getInstance().createSearchManager(SearchManagerType.COMBINED)
             searchSession1 = searchManager.submit(point, 20, SearchOptions(), searchListener)
-
-
         }
 
         override fun onMapLongTap(map: Map, point: Point) {
@@ -277,10 +275,12 @@ class EeE(context: Context, mapView: MapView) {
                 SearchFactory.getInstance().createSearchManager(SearchManagerType.COMBINED)
             searchSession1 = searchManager.submit(point, 20, SearchOptions(), searchListener)
             val placemark = mapView.map.mapObjects.addPlacemark().apply {
-                geometry = Point(Mapkit.latitude, Mapkit.longitude)
-                setIcon(ImageProvider.fromResource(context, R.drawable.ic_pin))
+                geometry = Point(point.latitude, point.longitude)
+                setIcon(ImageProvider.fromResource(context, R.drawable.selected_location))
             }
-            Toast.makeText(context, "point", Toast.LENGTH_SHORT).show()
+            latitude = placemark.geometry.latitude
+            longitude = placemark.geometry.longitude
+            cardView.visibility = View.VISIBLE
         }
     }
 
