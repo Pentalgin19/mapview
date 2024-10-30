@@ -5,6 +5,8 @@ import android.content.Context
 import android.view.View
 import android.view.inputmethod.EditorInfo
 import android.widget.EditText
+import android.widget.LinearLayout
+import android.widget.TextView
 import android.widget.TextView.OnEditorActionListener
 import android.widget.Toast
 import androidx.cardview.widget.CardView
@@ -45,8 +47,12 @@ import com.yandex.runtime.network.RemoteError
 
 class EeE(context: Context, mapView: MapView) {
 
-    lateinit var cardView: CardView
+    lateinit var cardView: LinearLayout
     private val mapView = mapView
+    lateinit var tvLatitude: TextView
+    lateinit var tvLongutude: TextView
+    var message = ""
+    lateinit var someInformation: TextView
     val finalTarget = Point(51.768996, 55.100944)
     private val context = context
 
@@ -245,23 +251,35 @@ class EeE(context: Context, mapView: MapView) {
                 ?: ""
 
             if (house != "" && street != ""){
-                Toast.makeText(context, "$street, $house", Toast.LENGTH_SHORT).show()
+                someInformation.text = "$street, $house"
             }else if (house != ""){
-                Toast.makeText(context, house, Toast.LENGTH_SHORT).show()
+                someInformation.text = house
             }else if (street != ""){
-                Toast.makeText(context, street, Toast.LENGTH_SHORT).show()
+                someInformation.text = street
             }else if (city != "" && country != ""){
-                Toast.makeText(context, "$city, $country", Toast.LENGTH_SHORT).show()
+                tvLatitude.text = latitude.toString()
+                tvLongutude.text = longitude.toString()
+                someInformation.text = "$city, $country"
             }else if (city != ""){
-                Toast.makeText(context, city, Toast.LENGTH_SHORT).show()
+                tvLatitude.text = latitude.toString()
+                tvLongutude.text = longitude.toString()
+                someInformation.text = city
             }else if (place != "" && country != ""){
-                Toast.makeText(context, "$place, $country", Toast.LENGTH_SHORT).show()
+                tvLatitude.text = latitude.toString()
+                tvLongutude.text = longitude.toString()
+                someInformation.text = "$place, $country"
             }else if (place != ""){
-                Toast.makeText(context, place, Toast.LENGTH_SHORT).show()
+                tvLatitude.text = latitude.toString()
+                tvLongutude.text = longitude.toString()
+                someInformation.text = place
             }else if (country != ""){
-                Toast.makeText(context, country, Toast.LENGTH_SHORT).show()
+                tvLatitude.text = latitude.toString()
+                tvLongutude.text = longitude.toString()
+                someInformation.text = country
             }else if (hydro != ""){
-                Toast.makeText(context, hydro, Toast.LENGTH_SHORT).show()
+                tvLatitude.text = latitude.toString()
+                tvLongutude.text = longitude.toString()
+                someInformation.text = hydro
             }
             val polyline = Polyline()
         }
@@ -269,6 +287,7 @@ class EeE(context: Context, mapView: MapView) {
         override fun onSearchError(p0: Error) {
         }
     }
+
     lateinit var searchSession1: Session
     private val route = Route(mapView, context)
 
@@ -300,6 +319,8 @@ class EeE(context: Context, mapView: MapView) {
             latitude = placemark.geometry.latitude
             longitude = placemark.geometry.longitude
             cardView.visibility = View.VISIBLE
+            tvLatitude.text = latitude.toString()
+            tvLongutude.text = longitude.toString()
         }
     }
 

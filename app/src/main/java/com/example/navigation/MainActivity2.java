@@ -79,7 +79,10 @@ public class MainActivity2 extends Activity {
         mapkit = new Mapkit(mapView, this, this, binding.edSearch);
 
         eee = new EeE(this, mapView);
-        eee.cardView = binding.cvShowRoute;
+        eee.cardView = binding.ll;
+        eee.tvLatitude = binding.latitude;
+        eee.tvLongutude = binding.longitude;
+        eee.someInformation = binding.someInformation;
         eee.addTapAndInputListener();
 
         binding.btnShowResults.setOnClickListener(v -> {
@@ -122,6 +125,7 @@ public class MainActivity2 extends Activity {
         if (!enabled) {
             Toast.makeText(this, "turn on your gps", Toast.LENGTH_LONG).show();
         }
+        mapkit.requestLocationPermission();
 
         binding.btnShowMyPosition.setOnClickListener(v -> {
             eee.setCameraPosition(lat, lon);
@@ -133,12 +137,11 @@ public class MainActivity2 extends Activity {
         binding.btnShowWalkingRoute.setOnClickListener(v -> {
             mapkit.setWalkingRoute();
         });
-        
+
         binding.btnShowCarRoute.setOnClickListener(v -> {
             mapkit.setCarRoute();
         });
 
-        mapkit.requestLocationPermission();
     }
 
     @Override

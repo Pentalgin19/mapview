@@ -135,8 +135,7 @@ class Mapkit(
             != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
                 context,
                 "android.permission.ACCESS_COARSE_LOCATION"
-            )
-            != PackageManager.PERMISSION_GRANTED
+            ) != PackageManager.PERMISSION_GRANTED
         ) {
             ActivityCompat.requestPermissions(
                 activity, arrayOf(
