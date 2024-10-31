@@ -155,7 +155,6 @@ class Mapkit(
     }
 
     override fun onSearchResponse(response: Response) {
-        mapView.map.mapObjects.clear()//работает, но с задержкой
         val mapObjectListener = mapView.mapWindow.map.mapObjects
         for (searchResult in response.collection.children) {
             val resultLocation = searchResult.obj!!.geometry[0].point!!
@@ -166,7 +165,6 @@ class Mapkit(
                     com.yandex.maps.mobile.R.drawable.search_layer_pin_icon_default
                 )
             )
-
         }
     }
 

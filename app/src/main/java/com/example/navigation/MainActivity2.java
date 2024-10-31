@@ -67,6 +67,7 @@ public class MainActivity2 extends Activity {
 
         binding.btnShowResults.setOnClickListener(v -> {
             if (search != null && !search.isEmpty()) {
+                clearPoint.clearSetPoint();
                 mapkit.setE(true);
                 mapkit.loc();
             } else {

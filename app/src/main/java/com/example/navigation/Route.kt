@@ -2,9 +2,9 @@ package com.example.navigation
 
 import android.content.Context
 import android.widget.Toast
+import androidx.core.content.ContextCompat
 import com.example.navigation.Mapkit.Companion.latitude
 import com.example.navigation.Mapkit.Companion.longitude
-import com.example.navigation.Mapkit.Companion.type
 import com.yandex.mapkit.RequestPoint
 import com.yandex.mapkit.RequestPointType
 import com.yandex.mapkit.directions.DirectionsFactory
@@ -126,6 +126,12 @@ class Route(mapView: MapView, context: Context) : DrivingSession.DrivingRouteLis
 
     private fun drawSection(data: SectionData, geometry: Polyline) {
         val polylineMapObject = mapView.mapWindow.map.mapObjects.addPolyline(geometry)
+        polylineMapObject.apply {
+            strokeWidth = 5f
+            setStrokeColor(ContextCompat.getColor(context, R.color.customBlue))
+            dashLength = 6f
+            gapLength = 6f
+        }
         if (data.transports != null) {
             for (transport in data.transports!!) {
                 if (transport.line.style != null) {
@@ -161,10 +167,19 @@ class Route(mapView: MapView, context: Context) : DrivingSession.DrivingRouteLis
         return null
     }
 
+    lateinit var points: List<Point>
     override fun onDrivingRoutes(p0: MutableList<DrivingRoute>) {
         for (route in p0) {
-            mapView.mapWindow.map.mapObjects.addPolyline(route.geometry)
+            points = listOf(Point(route.routePosition.point.latitude, route.routePosition.point.longitude))
+            val pO = mapView.mapWindow.map.mapObjects.addPolyline(route.geometry)
+            pO.apply {
+                strokeWidth = 5f
+                setStrokeColor(ContextCompat.getColor(context, R.color.customBlue))
+                dashLength = 6f
+                gapLength = 6f
+            }
         }
+
     }
 
     override fun onDrivingRoutesError(p0: Error) {
