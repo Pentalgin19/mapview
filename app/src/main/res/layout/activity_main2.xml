@@ -20,301 +20,388 @@
             app:layout_constraintTop_toTopOf="parent" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:layout_width="match_parent"
+    <ImageButton
+        android:id="@+id/btnShowResults"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:layout_marginEnd="20dp"
+        android:background="@drawable/btn_filter"
+        android:minWidth="50dp"
+        android:minHeight="50dp"
+        android:src="@drawable/filter1"
+        app:backgroundTint="@null"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <EditText
+        android:id="@+id/edSearch"
+        android:layout_width="300dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="10dp"
+        android:background="@drawable/search_bar_border"
+        android:fontFamily="@font/sora"
+        android:hint="Найти на карте"
+        android:imeOptions="actionSearch"
+        android:inputType="text"
+        android:maxLines="1"
+        android:minHeight="48dp"
+        android:paddingStart="19dp"
+        android:textColorHint="@color/_4A4A6A"
+        app:layout_constraintEnd_toStartOf="@+id/btnShowResults"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
-
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/searchBar"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:visibility="gone"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent">
-
-                <EditText
-                    android:id="@+id/edSearch"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:background="@drawable/search_bar_border"
-                    android:hint="@string/find"
-                    android:imeOptions="actionSearch"
-                    android:inputType="text"
-                    android:maxLines="1"
-                    android:minHeight="48dp"
-                    android:paddingStart="10dp"
-                    android:textColorHint="@color/blue"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
-
-                <HorizontalScrollView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginHorizontal="5dp"
-                    android:layout_marginTop="10dp"
-                    android:background="@android:color/transparent"
-                    android:scrollbarThumbHorizontal="@android:color/transparent"
-                    android:scrollbarTrackHorizontal="@android:color/transparent"
-                    app:backgroundTint="@null">
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content">
-
-                        <Button
-                            android:id="@+id/btnCafe"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:background="@drawable/btn_categories_style"
-                            android:minWidth="100dp"
-                            android:text="Кафе"
-                            android:textColor="@color/white"
-                            android:textSize="13sp"
-                            app:backgroundTint="@null" />
-
-                        <Button
-                            android:id="@+id/btnFuel"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginHorizontal="5dp"
-                            android:background="@drawable/btn_categories_style"
-                            android:minWidth="100dp"
-                            android:text="Топливо"
-                            android:textColor="@color/white"
-                            android:textSize="13sp"
-                            app:backgroundTint="@null" />
-
-                        <Button
-                            android:id="@+id/btnPark"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:background="@drawable/btn_categories_style"
-                            android:minWidth="100dp"
-                            android:text="Парки"
-                            android:textColor="@color/white"
-                            android:textSize="13sp"
-                            app:backgroundTint="@null" />
-
-                        <Button
-                            android:id="@+id/btnHospital"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginHorizontal="5dp"
-                            android:background="@drawable/btn_categories_style"
-                            android:minWidth="100dp"
-                            android:text="Больница"
-                            android:textColor="@color/white"
-                            android:textSize="13sp"
-                            app:backgroundTint="@null" />
-
-                        <Button
-                            android:id="@+id/btnHostel"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:background="@drawable/btn_categories_style"
-                            android:minWidth="100dp"
-                            android:text="Отель"
-                            android:textColor="@color/white"
-                            android:textSize="13sp"
-                            app:backgroundTint="@null" />
-
-                        <Button
-                            android:id="@+id/btnAttractions"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginStart="5dp"
-                            android:background="@drawable/btn_categories_style"
-                            android:minWidth="100dp"
-                            android:padding="5dp"
-                            android:text="Достопримечательности"
-                            android:textColor="@color/white"
-                            android:textSize="13sp"
-                            app:backgroundTint="@null" />
-
-                    </LinearLayout>
-                </HorizontalScrollView>
-
-            </LinearLayout>
-        </androidx.constraintlayout.widget.ConstraintLayout>
-
-        <ImageButton
-            android:id="@+id/btnShowResults"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:layout_marginEnd="10dp"
-            android:background="@drawable/clip"
-            android:minWidth="30dp"
-            android:minHeight="30dp"
-            android:src="@drawable/find"
-            android:text="@string/show_results"
-            app:backgroundTint="@null"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-    </androidx.constraintlayout.widget.ConstraintLayout>
+        app:layout_constraintTop_toTopOf="parent" />
 
     <LinearLayout
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginEnd="20dp"
         android:orientation="vertical"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent">
+        app:layout_constraintTop_toTopOf="parent">
 
         <ImageButton
             android:id="@+id/btnShowTrafficJams"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
-            android:layout_gravity="end"
-            android:background="@drawable/clip"
-            android:src="@drawable/two_cars_icon_177210"
-            app:backgroundTint="@null" />
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/btn_change_mashtab"
+            android:minWidth="50dp"
+            android:minHeight="50dp"
+            android:src="@drawable/plus_icon" />
 
-        <com.google.android.material.appbar.AppBarLayout
+        <ImageButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:background="@drawable/btn_change_mashtab"
+            android:minWidth="50dp"
+            android:minHeight="50dp"
+            android:src="@drawable/minus_icon" />
+
+    </LinearLayout>
+
+    <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/navBar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:animateLayoutChanges="true"
+        android:background="@color/white"
+        android:visibility="visible"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:animateLayoutChanges="true"
-            android:background="#105076">
+            android:background="@color/white"
+            android:orientation="horizontal"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
 
+            <ImageButton
+                android:id="@+id/btnShowWalkingRoute"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:backgroundTint="@android:color/transparent"
+                android:paddingHorizontal="7dp"
+                android:src="@drawable/people_icon"
+                app:layout_constraintBottom_toTopOf="@+id/tvWalkRoute"
+                app:layout_constraintEnd_toStartOf="@+id/btnShowMyPosition"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/tvWalkRoute"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/sora"
+                android:text="Пешком"
+                android:textColor="@color/_3F434A"
+                android:textSize="10sp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="@id/btnShowWalkingRoute"
+                app:layout_constraintStart_toStartOf="@id/btnShowWalkingRoute"
+                app:layout_constraintTop_toBottomOf="@+id/btnShowWalkingRoute" />
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/btnShowMyPosition"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="10dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/btnShowCarRoute"
+                app:layout_constraintStart_toEndOf="@+id/btnShowWalkingRoute"
+                app:layout_constraintTop_toTopOf="parent">
+
+                <ImageButton
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="5dp"
+                    android:layout_marginBottom="20dp"
+                    android:background="@drawable/btn_current_location"
+                    android:minWidth="65dp"
+                    android:minHeight="65dp"
+                    android:paddingHorizontal="7dp"
+                    android:src="@drawable/current_position_icon"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <ImageButton
+                android:id="@+id/btnShowCarRoute"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="7dp"
+                android:backgroundTint="@android:color/transparent"
+                android:minWidth="22dp"
+                android:minHeight="22dp"
+                android:paddingHorizontal="7dp"
+                android:src="@drawable/car_icon"
+                app:layout_constraintBottom_toTopOf="@id/tvCarRoute"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/btnShowMyPosition"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/tvCarRoute"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/sora"
+                android:text="Пешком"
+                android:textColor="@color/_3F434A"
+                android:textSize="10sp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="@id/btnShowCarRoute"
+                app:layout_constraintStart_toStartOf="@id/btnShowCarRoute"
+                app:layout_constraintTop_toBottomOf="@+id/btnShowCarRoute" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/ll"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="20dp"
+        android:background="@drawable/info_bar"
+        app:backgroundTint="@null"
+        app:layout_constraintBottom_toTopOf="@+id/navBar"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
+
+        <LinearLayout
+            android:id="@+id/info"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:visibility="visible"
+            android:padding="15dp"
+            android:orientation="vertical">
+            <TextView
+                android:id="@+id/someInformation"
+                android:layout_width="wrap_content"
+                android:fontFamily="@font/sora"
+                android:textSize="13sp"
+                android:textColor="@color/_1E1E1E"
+                android:layout_height="wrap_content" />
             <LinearLayout
-                android:id="@+id/ll"
+                android:id="@+id/llLatitudeLongitude"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:visibility="visible">
+                android:orientation="horizontal"
+                app:layout_constraintStart_toStartOf="parent">
 
-                <androidx.constraintlayout.widget.ConstraintLayout
-                    android:layout_width="match_parent"
+                <ImageView
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:minHeight="50dp">
+                    android:layout_gravity="center_vertical"
+                    android:contentDescription="location"
+                    android:src="@drawable/lat_lon" />
 
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent">
+                <TextView
+                    android:id="@+id/latitude"
+                    android:layout_gravity="center_vertical"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="3dp" />
 
-                        <HorizontalScrollView
-                            android:id="@+id/llButton"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:scrollbarThumbHorizontal="@android:color/transparent"
-                            android:scrollbarTrackHorizontal="@android:color/transparent"
-                            app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintTop_toTopOf="parent">
-
-                            <LinearLayout
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:orientation="horizontal">
-
-                                <Button
-                                    android:id="@+id/btnShowCarRoute"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:layout_marginStart="7dp"
-                                    android:background="@drawable/btn_navigation"
-                                    android:minWidth="100dp"
-                                    android:paddingHorizontal="7dp"
-                                    android:text="@string/show_car_route"
-                                    android:textAllCaps="false"
-                                    android:textAlignment="center"
-                                    app:backgroundTint="@null"
-                                    app:layout_constraintTop_toTopOf="parent" />
-
-                                <Button
-                                    android:id="@+id/btnShowMyPosition"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:layout_marginHorizontal="5dp"
-                                    android:background="@drawable/btn_navigation"
-                                    android:text="@string/show_my_position"
-                                    android:textAlignment="center"
-                                    android:paddingHorizontal="7dp"
-                                    android:textAllCaps="false"
-                                    app:backgroundTint="@null"
-                                    app:layout_constraintBottom_toBottomOf="parent"
-                                    app:layout_constraintEnd_toStartOf="@+id/btnShowWalkingRoute"
-                                    app:layout_constraintTop_toTopOf="parent" />
-
-                                <Button
-                                    android:id="@+id/btnShowWalkingRoute"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:background="@drawable/btn_navigation"
-                                    android:text="@string/show_a_walking_route"
-                                    android:textAlignment="center"
-                                    android:textAllCaps="false"
-                                    android:paddingHorizontal="7dp"
-                                    app:backgroundTint="@null"
-                                    app:layout_constraintEnd_toEndOf="parent"
-                                    app:layout_constraintStart_toEndOf="@+id/btnShowMyPosition"
-                                    app:layout_constraintTop_toTopOf="parent" />
-                            </LinearLayout>
-                        </HorizontalScrollView>
-
-                        <LinearLayout
-                            android:id="@+id/llLatitudeLongitude"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:orientation="horizontal"
-                            android:layout_marginTop="5dp"
-                            android:layout_marginHorizontal="5dp"
-                            app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintTop_toBottomOf="@+id/llButton">
-
-                            <ImageView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:contentDescription="location"
-                                android:src="@drawable/empty_location" />
-
-                            <TextView
-                                android:id="@+id/latitude"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginStart="3dp" />
-
-                            <TextView
-                                android:id="@+id/longitude"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginStart="5dp" />
-                        </LinearLayout>
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:orientation="horizontal"
-                            android:layout_marginHorizontal="5dp"
-                            android:layout_marginVertical="5dp">
-                            <ImageView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:contentDescription="location"
-                                android:src="@drawable/not_empty_location" />
-
-                            <TextView
-                                android:layout_marginStart="3dp"
-                                android:id="@+id/someInformation"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content" />
-                        </LinearLayout>
-                    </LinearLayout>
-                </androidx.constraintlayout.widget.ConstraintLayout>
+                <TextView
+                    android:id="@+id/longitude"
+                    android:layout_gravity="center_vertical"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="5dp" />
             </LinearLayout>
-        </com.google.android.material.appbar.AppBarLayout>
-    </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:contentDescription="location"
+                    android:src="@drawable/marsh_time" />
+
+            </LinearLayout>
+        </LinearLayout>
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/cardViewFilter"
+        android:visibility="gone"
+        android:layout_width="match_parent"
+        android:layout_height="400dp"
+        android:background="@drawable/cardview_back"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" >
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:padding="25dp">
+            <TextView
+                android:id="@+id/where"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                android:fontFamily="@font/sora"
+                android:textStyle="bold"
+                android:textSize="16sp"
+                android:text="Куда сходить?"/>
+            <GridLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintTop_toBottomOf="@+id/where"
+                app:layout_constraintStart_toStartOf="parent"
+                android:layout_marginTop="25dp"
+                android:rowCount="2"
+                android:columnCount="4">
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="16dp"
+                    android:orientation="vertical">
+                    <ImageButton
+                        android:layout_height="wrap_content"
+                        android:layout_width="wrap_content"
+                        android:layout_gravity="center_vertical"
+                        android:background="@android:color/transparent"
+                        android:src="@drawable/cafe"/>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_horizontal"
+                        android:textSize="13sp"
+                        android:text="Кафе"/>
+                </LinearLayout>
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="16dp"
+                    android:orientation="vertical">
+                    <ImageButton
+                        android:layout_height="wrap_content"
+                        android:layout_width="wrap_content"
+                        android:layout_gravity="center_vertical"
+                        android:background="@android:color/transparent"
+                        android:src="@drawable/gasoline"/>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_horizontal"
+                        android:textSize="13sp"
+                        android:text="АЗС"/>
+                </LinearLayout>
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="16dp"
+                    android:orientation="vertical">
+                    <ImageButton
+                        android:layout_height="wrap_content"
+                        android:layout_width="wrap_content"
+                        android:layout_gravity="center_vertical"
+                        android:background="@android:color/transparent"
+                        android:src="@drawable/park"/>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_horizontal"
+                        android:textSize="13sp"
+                        android:text="Парки"/>
+                </LinearLayout>
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="16dp"
+                    android:orientation="vertical">
+                    <ImageButton
+                        android:layout_height="wrap_content"
+                        android:layout_width="wrap_content"
+                        android:layout_gravity="center_vertical"
+                        android:background="@android:color/transparent"
+                        android:src="@drawable/hospital"/>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_horizontal"
+                        android:textSize="13sp"
+                        android:text="Больницы"/>
+                </LinearLayout>
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="16dp"
+                    android:layout_marginTop="16dp"
+                    android:orientation="vertical">
+                    <ImageButton
+                        android:layout_height="wrap_content"
+                        android:layout_width="wrap_content"
+                        android:layout_gravity="center_vertical"
+                        android:background="@android:color/transparent"
+                        android:src="@drawable/hotel"/>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_horizontal"
+                        android:textSize="13sp"
+                        android:text="Отели"/>
+                </LinearLayout>
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="16dp"
+                    android:layout_marginTop="16dp"
+                    android:orientation="vertical">
+                    <ImageButton
+                        android:layout_height="wrap_content"
+                        android:layout_width="wrap_content"
+                        android:layout_gravity="center_vertical"
+                        android:background="@android:color/transparent"
+                        android:src="@drawable/star"/>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_horizontal"
+                        android:textSize="13sp"
+                        android:textAlignment="center"
+                        android:text="Что\nпосетить"/>
+                </LinearLayout>
+            </GridLayout>
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </androidx.cardview.widget.CardView>
+
 </androidx.constraintlayout.widget.ConstraintLayout>

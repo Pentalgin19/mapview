@@ -4,6 +4,7 @@ import android.content.Context
 import android.view.View
 import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.cardview.widget.CardView
 import com.yandex.mapkit.Animation
 import com.yandex.mapkit.geometry.Point
 import com.yandex.mapkit.geometry.Polyline
@@ -28,6 +29,8 @@ import com.yandex.runtime.image.ImageProvider
 class EeE(context: Context, mapView: MapView) {
 
     lateinit var cardView: LinearLayout
+    lateinit var cardViewFilter: CardView
+    lateinit var info: LinearLayout
     private val mapView = mapView
     lateinit var tvLatitude: TextView
     lateinit var tvLongutude: TextView
@@ -180,27 +183,27 @@ class EeE(context: Context, mapView: MapView) {
             }else if (street != ""){
                 someInformation.text = street
             }else if (city != "" && country != ""){
-                tvLatitude.text = latitude.toString()
+                tvLatitude.text = latitude.toString() + ","
                 tvLongutude.text = longitude.toString()
                 someInformation.text = "$city, $country"
             }else if (city != ""){
-                tvLatitude.text = latitude.toString()
+                tvLatitude.text = latitude.toString() + ","
                 tvLongutude.text = longitude.toString()
                 someInformation.text = city
             }else if (place != "" && country != ""){
-                tvLatitude.text = latitude.toString()
+                tvLatitude.text = latitude.toString() + ","
                 tvLongutude.text = longitude.toString()
                 someInformation.text = "$place, $country"
             }else if (place != ""){
-                tvLatitude.text = latitude.toString()
+                tvLatitude.text = latitude.toString() + ","
                 tvLongutude.text = longitude.toString()
                 someInformation.text = place
             }else if (country != ""){
-                tvLatitude.text = latitude.toString()
+                tvLatitude.text = latitude.toString() + ","
                 tvLongutude.text = longitude.toString()
                 someInformation.text = country
             }else if (hydro != ""){
-                tvLatitude.text = latitude.toString()
+                tvLatitude.text = latitude.toString() + ","
                 tvLongutude.text = longitude.toString()
                 someInformation.text = hydro
             }
@@ -268,12 +271,21 @@ class EeE(context: Context, mapView: MapView) {
 
     private val inputListener = object : InputListener {
         override fun onMapTap(map: Map, point: Point) {
+            cardViewFilter.visibility = View.GONE
+            info.visibility = View.VISIBLE;
             val searchManager =
                 SearchFactory.getInstance().createSearchManager(SearchManagerType.COMBINED)
             searchSession1 = searchManager.submit(point, 20, SearchOptions(), searchListener)
+
+            latitude = placemark.geometry.latitude
+            longitude = placemark.geometry.longitude
+            cardView.visibility = View.VISIBLE
+            tvLatitude.text = latitude.toString()
+            tvLongutude.text = longitude.toString()
         }
 
         override fun onMapLongTap(map: Map, point: Point) {
+            cardViewFilter.visibility = View.GONE
             selectedPointLatitude = point.latitude
             selectedPointLongitude = point.longitude
             map.mapObjects.clear()

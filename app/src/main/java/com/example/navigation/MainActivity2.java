@@ -55,7 +55,9 @@ public class MainActivity2 extends Activity {
         mapkit = new Mapkit(mapView, this, this, binding.edSearch);
 
         eee = new EeE(this, mapView);
+        eee.info = binding.info;
         eee.cardView = binding.ll;
+        eee.cardViewFilter = binding.cardViewFilter;
         eee.tvLatitude = binding.latitude;
         eee.tvLongutude = binding.longitude;
         eee.someInformation = binding.someInformation;
@@ -66,16 +68,11 @@ public class MainActivity2 extends Activity {
         NavKit navKit = new NavKit(this, mapView);
 
         binding.btnShowResults.setOnClickListener(v -> {
+            binding.cardViewFilter.setVisibility(View.VISIBLE);
             if (search != null && !search.isEmpty()) {
                 clearPoint.clearSetPoint();
                 mapkit.setE(true);
                 mapkit.loc();
-            } else {
-                if (binding.searchBar.getVisibility() == View.VISIBLE) {
-                    binding.searchBar.setVisibility(View.GONE);
-                } else {
-                    binding.searchBar.setVisibility(View.VISIBLE);
-                }
             }
         });
 
