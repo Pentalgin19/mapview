@@ -81,23 +81,17 @@ class Mapkit(
     private lateinit var session: Session
     private var check = false
 
-    private var routeStartLocation = com.yandex.mapkit.geometry.Point(0.0000, 0.000)
-    private var routeEndLocation =
-        com.yandex.mapkit.geometry.Point(51.770846, 55.123653)//51.770846, 55.123653
-    private val screenCenter = com.yandex.mapkit.geometry.Point(
+    private var routeStartLocation = Point(0.0000, 0.000)
+    private var routeEndLocation = Point(51.770846, 55.123653)//51.770846, 55.123653
+    private val screenCenter = Point(
         (routeStartLocation.latitude + routeEndLocation.latitude) / 2,
         (routeStartLocation.longitude + routeEndLocation.longitude) / 2,
     )
-    private var mapObjects: MapObjectCollection? = null
-    private var drivingRouter: DrivingRouter? = null
-    private var drivingSession: DrivingSession? = null
 
     fun loc() {
-        eee.showHide(false)
-        locationMapkit.isVisible = true
         locationMapkit.setObjectListener(this)
         searchManager = SearchFactory.getInstance().createSearchManager(SearchManagerType.COMBINED)
-        mapView.map.addCameraListener(this)
+        mapView.mapWindow.map.addCameraListener(this)
         searchEditText.setOnEditorActionListener { _, i, _ ->
             if (i == EditorInfo.IME_ACTION_SEARCH) {
                 submitQuery(searchEditText.text.toString())
@@ -162,7 +156,7 @@ class Mapkit(
 
     override fun onSearchResponse(response: Response) {
         mapView.map.mapObjects.clear()//работает, но с задержкой
-        val mapObjectListener = mapView.map.mapObjects
+        val mapObjectListener = mapView.mapWindow.map.mapObjects
         for (searchResult in response.collection.children) {
             val resultLocation = searchResult.obj!!.geometry[0].point!!
             mapObjectListener.addPlacemark(
@@ -195,14 +189,10 @@ class Mapkit(
     }
 
     fun setCarRoute(){
-        eee.setPoint(latitude, longitude)
-        eee.setSelectedPoint(EeE.selectedPointLatitude, EeE.selectedPointLongitude)
         route.setCarRoute()
     }
 
     fun setWalkingRoute(){
-        eee.setPoint(latitude, longitude)
-        eee.setSelectedPoint(EeE.selectedPointLatitude, EeE.selectedPointLongitude)
         route.setWalkingRoute()
     }
 }

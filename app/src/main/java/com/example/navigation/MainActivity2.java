@@ -1,11 +1,6 @@
 package com.example.navigation;
 
-import java.util.Date;
-
 import android.app.Activity;
-import android.content.Context;
-import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationListener;
@@ -13,42 +8,23 @@ import android.location.LocationManager;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.view.KeyEvent;
 import android.view.View;
-import android.view.inputmethod.EditorInfo;
-import android.widget.Button;
 import android.widget.ImageButton;
-import android.widget.SearchView;
-import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
-import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.app.ActivityCompat;
 
 import com.example.navigation.databinding.ActivityMain2Binding;
-import com.yandex.mapkit.GeoObjectCollection;
 import com.yandex.mapkit.MapKitFactory;
-import com.yandex.mapkit.geometry.Point;
-import com.yandex.mapkit.map.CameraListener;
-import com.yandex.mapkit.map.CameraPosition;
-import com.yandex.mapkit.map.CameraUpdateReason;
-import com.yandex.mapkit.map.Map;
-import com.yandex.mapkit.map.MapObjectCollection;
-import com.yandex.mapkit.map.VisibleRegionUtils;
 import com.yandex.mapkit.mapview.MapView;
-import com.yandex.mapkit.search.Response;
 import com.yandex.mapkit.search.SearchFactory;
 import com.yandex.mapkit.search.SearchManager;
 import com.yandex.mapkit.search.SearchManagerType;
-import com.yandex.mapkit.search.SearchOptions;
 import com.yandex.mapkit.search.Session;
-import com.yandex.runtime.Error;
-import com.yandex.runtime.image.ImageProvider;
-import com.yandex.runtime.network.NetworkError;
-import com.yandex.runtime.network.RemoteError;
 
 public class MainActivity2 extends Activity {
+    public Double lat = 0.00000;
+    public Double lon = 0.00000;
 
     private ImageButton btnShowTrafficJams;
 
@@ -61,9 +37,9 @@ public class MainActivity2 extends Activity {
     public Mapkit mapkit;
     private Boolean showWhereIAM = true;
     private boolean enabled;
-    private Double lat = 0.00000;
-    private Double lon = 0.00000;
     private EeE eee;
+    private ClearPoint clearPoint;
+    private Route route;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -85,14 +61,18 @@ public class MainActivity2 extends Activity {
         eee.someInformation = binding.someInformation;
         eee.addTapAndInputListener();
 
+        clearPoint = new ClearPoint(this, mapView);
+
+        NavKit navKit = new NavKit(this, mapView);
+
         binding.btnShowResults.setOnClickListener(v -> {
             if (search != null && !search.isEmpty()) {
                 mapkit.setE(true);
                 mapkit.loc();
-            }else{
-                if (binding.searchBar.getVisibility() == View.VISIBLE){
+            } else {
+                if (binding.searchBar.getVisibility() == View.VISIBLE) {
                     binding.searchBar.setVisibility(View.GONE);
-                }else{
+                } else {
                     binding.searchBar.setVisibility(View.VISIBLE);
                 }
             }
@@ -128,17 +108,27 @@ public class MainActivity2 extends Activity {
         mapkit.requestLocationPermission();
 
         binding.btnShowMyPosition.setOnClickListener(v -> {
-            eee.setCameraPosition(lat, lon);
-            eee.showHide(true);
+            if (Route.getWalkRoute()) {
+                eee.setCameraPosition(lat, lon);
+            } else if (Route.getCarRoute()) {
+                eee.setCameraPosition(lat, lon);
+            } else {
+                eee.setCameraPosition(lat, lon);
+                eee.setPoint(lat, lon);
+                eee.showHide(true);
+            }
         });
 
-        Route route = new Route(mapView, this);
+        route = new Route(mapView, this);
 
         binding.btnShowWalkingRoute.setOnClickListener(v -> {
+            clearPoint.clearSetPoint();
+
             mapkit.setWalkingRoute();
         });
 
         binding.btnShowCarRoute.setOnClickListener(v -> {
+            clearPoint.clearSetPoint();
             mapkit.setCarRoute();
         });
 
@@ -147,15 +137,17 @@ public class MainActivity2 extends Activity {
     @Override
     protected void onResume() {
         super.onResume();
-        if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+        if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED
+                && ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED) {
             return;
         }
-        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,
-                1000 * 10, 10, locationListener);
         locationManager.requestLocationUpdates(
-                LocationManager.NETWORK_PROVIDER, 1000 * 10, 10,
+                LocationManager.NETWORK_PROVIDER, 500, 10,
                 locationListener);
-        checkEnabled();
+        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,
+                500, 10, locationListener);
     }
 
     @Override
@@ -169,28 +161,35 @@ public class MainActivity2 extends Activity {
         @Override
         public void onLocationChanged(Location location) {
             if (enabled) {
-                lat = location.getLatitude();
-                lon = location.getLongitude();
                 Mapkit.setLatitude(location.getLatitude());
                 Mapkit.setLongitude(location.getLongitude());
+                EeE.setMyLatitude(location.getLatitude());
+                EeE.setMyLongitude(location.getLongitude());
+
+                clearPoint.clearSetPoint();
+                if (Route.getCarRoute()){
+                    route.setCarRoute();
+                }
+                if (Route.getWalkRoute()){
+                    route.setWalkingRoute();
+                }
+                lat = location.getLatitude();
+                lon = location.getLongitude();
                 if (showWhereIAM) {
                     EeE eee = new EeE(MainActivity2.this, mapView);
                     eee.setCameraPosition(lat, lon);
                     eee.showHide(true);
                     showWhereIAM = false;
                 }
-                eee.setPoint(location.getLatitude(), location.getLongitude());
             }
         }
 
         @Override
         public void onProviderDisabled(String provider) {
-            checkEnabled();
         }
 
         @Override
         public void onProviderEnabled(String provider) {
-            checkEnabled();
             if (ActivityCompat.checkSelfPermission(
                     MainActivity2.this, android.Manifest.permission.ACCESS_FINE_LOCATION)
                     != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(MainActivity2.this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
@@ -202,10 +201,6 @@ public class MainActivity2 extends Activity {
         public void onStatusChanged(String provider, int status, Bundle extras) {
         }
     };
-
-    private void checkEnabled() {
-
-    }
 
     @Override
     protected void onStart() {

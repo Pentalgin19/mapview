@@ -37,8 +37,12 @@ import com.yandex.runtime.network.RemoteError
 
 class Route(mapView: MapView, context: Context) : DrivingSession.DrivingRouteListener{
 
-    private val context = context
-    private val mapView = mapView
+    companion object{
+        @JvmStatic var walkRoute = false
+        @JvmStatic var carRoute = false
+    }
+    val context = context
+    val mapView = mapView
     private var mapObjects: MapObjectCollection? = null
     private var drivingRouter: DrivingRouter? = null
     private var routeStartLocation = Point(0.0000, 0.000)
@@ -48,24 +52,26 @@ class Route(mapView: MapView, context: Context) : DrivingSession.DrivingRouteLis
     private lateinit var mtRouter: MasstransitRouter
 
     fun setCarRoute() {
-        type = 2
-        mapView.mapWindow.map.mapObjects.clear()
+        carRoute = true
+        walkRoute = false
         routeEndLocation = Point(EeE.latitude, EeE.longitude)
         routeStartLocation = Point(latitude, longitude)
         drivingRouter =
             DirectionsFactory.getInstance().createDrivingRouter(DrivingRouterType.COMBINED)
-        mapObjects = mapView.map.mapObjects.addCollection()
+        mapObjects = mapView.mapWindow.map.mapObjects.addCollection()
 
         submitRequest()
     }
 
+    private val clearPoint = ClearPoint(context, mapView)
     fun setWalkingRoute(){
-        type = 1
+        walkRoute = true
+        carRoute = false
+        clearPoint.clearSetPoint()
         val transitOptions = TransitOptions(FilterVehicleTypes.NONE.value, TimeOptions())
         val avoidSteep = false
         val routeOptions = RouteOptions(FitnessOptions(avoidSteep))
         val points: MutableList<RequestPoint> = ArrayList()
-        mapView.mapWindow.map.mapObjects.clear()
         points.add(
             RequestPoint(
                 Point(latitude, longitude), RequestPointType.WAYPOINT, null, null
@@ -119,7 +125,7 @@ class Route(mapView: MapView, context: Context) : DrivingSession.DrivingRouteLis
     }
 
     private fun drawSection(data: SectionData, geometry: Polyline) {
-        val polylineMapObject = mapView.map.mapObjects.addPolyline(geometry)
+        val polylineMapObject = mapView.mapWindow.map.mapObjects.addPolyline(geometry)
         if (data.transports != null) {
             for (transport in data.transports!!) {
                 if (transport.line.style != null) {
@@ -157,7 +163,7 @@ class Route(mapView: MapView, context: Context) : DrivingSession.DrivingRouteLis
 
     override fun onDrivingRoutes(p0: MutableList<DrivingRoute>) {
         for (route in p0) {
-            mapObjects!!.addPolyline(route.geometry)
+            mapView.mapWindow.map.mapObjects.addPolyline(route.geometry)
         }
     }
 

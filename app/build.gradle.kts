@@ -5,7 +5,7 @@ plugins {
 
 android {
     namespace = "com.example.navigation"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "com.example.navigation"
@@ -40,6 +40,10 @@ android {
 
 dependencies {
     implementation (libs.maps.mobile)
+    implementation (libs.maps.mobile.v481navikit)
+    implementation (libs.play.services.location)
+    implementation (libs.automotivenavigation)
+    implementation (libs.roadevents)
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
