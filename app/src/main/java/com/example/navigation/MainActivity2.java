@@ -8,8 +8,10 @@ import android.location.LocationManager;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.view.KeyEvent;
 import android.view.View;
 import android.widget.ImageButton;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.core.app.ActivityCompat;
@@ -79,7 +81,40 @@ public class MainActivity2 extends Activity {
         btnShowTrafficJams.setOnClickListener(v -> {
             mapkit.showTrafficJams();
         });
-
+        binding.btnCafe.setOnClickListener(v -> {
+            search = "Кафе";
+        });
+        binding.btnGasoline.setOnClickListener(v -> {
+            search = "заправка";
+            // handler
+        });
+        binding.btnPark.setOnClickListener(v -> {
+            search = "парк";
+            // handler
+        });
+        binding.btnHospital.setOnClickListener(v -> {
+            search = "больница";
+            // handler
+        });
+        binding.btnHotel.setOnClickListener(v -> {
+            search = "отель";
+            // handler
+        });
+        binding.btnStar.setOnClickListener(v -> {
+            search = "где поесть";
+            // handler
+        });
+        binding.edSearch.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                if( event != null && event.getKeyCode() == KeyEvent.KEYCODE_ENTER){
+                    search = v.getText().toString();
+                    // обработка нажатия Enter
+                    return true;
+                }
+                return false;
+            }
+        });
         binding.edSearch.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
@@ -93,7 +128,7 @@ public class MainActivity2 extends Activity {
 
             @Override
             public void afterTextChanged(Editable editable) {
-
+                search = editable.toString();
             }
         });
 

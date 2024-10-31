@@ -277,11 +277,11 @@ class EeE(context: Context, mapView: MapView) {
                 SearchFactory.getInstance().createSearchManager(SearchManagerType.COMBINED)
             searchSession1 = searchManager.submit(point, 20, SearchOptions(), searchListener)
 
-            latitude = placemark.geometry.latitude
-            longitude = placemark.geometry.longitude
-            cardView.visibility = View.VISIBLE
-            tvLatitude.text = latitude.toString()
-            tvLongutude.text = longitude.toString()
+//            latitude = placemark.geometry.latitude
+//            longitude = placemark.geometry.longitude
+//            cardView.visibility = View.VISIBLE
+//            tvLatitude.text = latitude.toString()
+//            tvLongutude.text = longitude.toString()
         }
 
         override fun onMapLongTap(map: Map, point: Point) {

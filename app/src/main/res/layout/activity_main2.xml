@@ -288,6 +288,7 @@
                     android:layout_marginEnd="16dp"
                     android:orientation="vertical">
                     <ImageButton
+                        android:id="@+id/btnCafe"
                         android:layout_height="wrap_content"
                         android:layout_width="wrap_content"
                         android:layout_gravity="center_vertical"
@@ -307,6 +308,7 @@
                     android:layout_marginEnd="16dp"
                     android:orientation="vertical">
                     <ImageButton
+                        android:id="@+id/btnGasoline"
                         android:layout_height="wrap_content"
                         android:layout_width="wrap_content"
                         android:layout_gravity="center_vertical"
@@ -326,6 +328,7 @@
                     android:layout_marginEnd="16dp"
                     android:orientation="vertical">
                     <ImageButton
+                        android:id="@+id/btnPark"
                         android:layout_height="wrap_content"
                         android:layout_width="wrap_content"
                         android:layout_gravity="center_vertical"
@@ -345,6 +348,7 @@
                     android:layout_marginEnd="16dp"
                     android:orientation="vertical">
                     <ImageButton
+                        android:id="@+id/btnHospital"
                         android:layout_height="wrap_content"
                         android:layout_width="wrap_content"
                         android:layout_gravity="center_vertical"
@@ -365,6 +369,7 @@
                     android:layout_marginTop="16dp"
                     android:orientation="vertical">
                     <ImageButton
+                        android:id="@+id/btnHotel"
                         android:layout_height="wrap_content"
                         android:layout_width="wrap_content"
                         android:layout_gravity="center_vertical"
@@ -385,6 +390,7 @@
                     android:layout_marginTop="16dp"
                     android:orientation="vertical">
                     <ImageButton
+                        android:id="@+id/btnStar"
                         android:layout_height="wrap_content"
                         android:layout_width="wrap_content"
                         android:layout_gravity="center_vertical"
