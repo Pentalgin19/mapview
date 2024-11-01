@@ -3,8 +3,6 @@ package com.example.navigation
 import android.content.Context
 import android.widget.Toast
 import androidx.core.content.ContextCompat
-import com.example.navigation.Mapkit.Companion.latitude
-import com.example.navigation.Mapkit.Companion.longitude
 import com.yandex.mapkit.RequestPoint
 import com.yandex.mapkit.RequestPointType
 import com.yandex.mapkit.directions.DirectionsFactory
@@ -17,7 +15,10 @@ import com.yandex.mapkit.directions.driving.VehicleOptions
 import com.yandex.mapkit.geometry.Point
 import com.yandex.mapkit.geometry.Polyline
 import com.yandex.mapkit.geometry.SubpolylineHelper
+import com.yandex.mapkit.geometry.geo.PolylineIndex
+import com.yandex.mapkit.geometry.geo.PolylineUtils
 import com.yandex.mapkit.map.MapObjectCollection
+import com.yandex.mapkit.map.PolylineMapObject
 import com.yandex.mapkit.mapview.MapView
 import com.yandex.mapkit.transport.TransportFactory
 import com.yandex.mapkit.transport.masstransit.FilterVehicleTypes
@@ -26,6 +27,7 @@ import com.yandex.mapkit.transport.masstransit.MasstransitRouter
 import com.yandex.mapkit.transport.masstransit.Route
 import com.yandex.mapkit.transport.masstransit.RouteOptions
 import com.yandex.mapkit.transport.masstransit.SectionMetadata.SectionData
+import com.yandex.mapkit.transport.masstransit.Session
 import com.yandex.mapkit.transport.masstransit.Session.RouteListener
 import com.yandex.mapkit.transport.masstransit.TimeOptions
 import com.yandex.mapkit.transport.masstransit.TransitOptions
@@ -40,6 +42,8 @@ class Route(mapView: MapView, context: Context) : DrivingSession.DrivingRouteLis
     companion object{
         @JvmStatic var walkRoute = false
         @JvmStatic var carRoute = false
+        @JvmStatic var carPolylineMapObject: PolylineMapObject? = null
+        @JvmStatic var walkPolylineMapObject:  PolylineMapObject? = null
     }
     val context = context
     val mapView = mapView
@@ -47,15 +51,16 @@ class Route(mapView: MapView, context: Context) : DrivingSession.DrivingRouteLis
     private var drivingRouter: DrivingRouter? = null
     private var routeStartLocation = Point(0.0000, 0.000)
     private var routeEndLocation =
-        Point(51.770846, 55.123653)//51.770846, 55.123653
-    private var drivingSession: DrivingSession? = null
+        Point(51.770846, 55.123653)
+    var drivingSession: DrivingSession? = null
     private lateinit var mtRouter: MasstransitRouter
+    var walkingSession: Session? = null
 
     fun setCarRoute() {
         carRoute = true
         walkRoute = false
-        routeEndLocation = Point(EeE.latitude, EeE.longitude)
-        routeStartLocation = Point(latitude, longitude)
+        routeStartLocation = Point(EeE.myLatitude, EeE.myLongitude)
+        routeEndLocation = Point(EeE.selectedPointLatitude, EeE.selectedPointLongitude)
         drivingRouter =
             DirectionsFactory.getInstance().createDrivingRouter(DrivingRouterType.COMBINED)
         mapObjects = mapView.mapWindow.map.mapObjects.addCollection()
@@ -63,27 +68,26 @@ class Route(mapView: MapView, context: Context) : DrivingSession.DrivingRouteLis
         submitRequest()
     }
 
-    private val clearPoint = ClearPoint(context, mapView)
     fun setWalkingRoute(){
         walkRoute = true
         carRoute = false
-        clearPoint.clearSetPoint()
         val transitOptions = TransitOptions(FilterVehicleTypes.NONE.value, TimeOptions())
         val avoidSteep = false
         val routeOptions = RouteOptions(FitnessOptions(avoidSteep))
         val points: MutableList<RequestPoint> = ArrayList()
+        points.clear()
         points.add(
             RequestPoint(
-                Point(latitude, longitude), RequestPointType.WAYPOINT, null, null
+                Point(EeE.myLatitude, EeE.myLongitude), RequestPointType.WAYPOINT, null, null
             )
         )
         points.add(
             RequestPoint(
-                Point(EeE.latitude, EeE.longitude), RequestPointType.WAYPOINT, null, null
+                Point(EeE.selectedPointLatitude, EeE.selectedPointLongitude), RequestPointType.WAYPOINT, null, null
             )
         )
         mtRouter = TransportFactory.getInstance().createMasstransitRouter()
-        mtRouter.requestRoutes(points, transitOptions, routeOptions, masstransitRouter)
+        walkingSession = mtRouter.requestRoutes(points, transitOptions, routeOptions, masstransitRouter)
     }
 
     private fun submitRequest() {
@@ -125,8 +129,8 @@ class Route(mapView: MapView, context: Context) : DrivingSession.DrivingRouteLis
     }
 
     private fun drawSection(data: SectionData, geometry: Polyline) {
-        val polylineMapObject = mapView.mapWindow.map.mapObjects.addPolyline(geometry)
-        polylineMapObject.apply {
+        carPolylineMapObject = mapView.mapWindow.map.mapObjects.addPolyline(geometry)
+        carPolylineMapObject!!.apply {
             strokeWidth = 5f
             setStrokeColor(ContextCompat.getColor(context, R.color.customBlue))
             dashLength = 6f
@@ -145,16 +149,16 @@ class Route(mapView: MapView, context: Context) : DrivingSession.DrivingRouteLis
             for (transport in data.transports!!) {
                 val sectionVehicleType = getVehicleType(transport, knownVehicleTypes)
                 if (sectionVehicleType == "bus") {
-                    polylineMapObject.setStrokeColor(-0xff0100) // Green
+                    carPolylineMapObject!!.setStrokeColor(-0xff0100) // Green
                     return
                 } else if (sectionVehicleType == "tramway") {
-                    polylineMapObject.setStrokeColor(-0x10000) // Red
+                    carPolylineMapObject!!.setStrokeColor(-0x10000) // Red
                     return
                 }
             }
 //            polylineMapObject.setStrokeColor(-0xffff01) // Blue
         } else {
-            polylineMapObject.setStrokeColor(-0x1000000) // Black
+            carPolylineMapObject!!.setStrokeColor(-0x1000000) // Black
         }
     }
 
@@ -167,12 +171,10 @@ class Route(mapView: MapView, context: Context) : DrivingSession.DrivingRouteLis
         return null
     }
 
-    lateinit var points: List<Point>
     override fun onDrivingRoutes(p0: MutableList<DrivingRoute>) {
         for (route in p0) {
-            points = listOf(Point(route.routePosition.point.latitude, route.routePosition.point.longitude))
-            val pO = mapView.mapWindow.map.mapObjects.addPolyline(route.geometry)
-            pO.apply {
+            walkPolylineMapObject = mapView.mapWindow.map.mapObjects.addPolyline(route.geometry)
+            walkPolylineMapObject!!.apply {
                 strokeWidth = 5f
                 setStrokeColor(ContextCompat.getColor(context, R.color.customBlue))
                 dashLength = 6f
@@ -186,4 +188,21 @@ class Route(mapView: MapView, context: Context) : DrivingSession.DrivingRouteLis
         val error = "unknown error"
         Toast.makeText(context, error, Toast.LENGTH_SHORT).show()
     }
+
+    fun distanceBetweenPointsOnRoute(route: DrivingRoute, first: Point, second: Point): Double {
+        val polylineIndex = PolylineUtils.createPolylineIndex(route.geometry)
+        val firstPosition = polylineIndex.closestPolylinePosition(first, PolylineIndex.Priority.CLOSEST_TO_RAW_POINT, 1.0)!!
+        val secondPosition = polylineIndex.closestPolylinePosition(second, PolylineIndex.Priority.CLOSEST_TO_RAW_POINT, 1.0)!!
+        return PolylineUtils.distanceBetweenPolylinePositions(route.geometry,
+            firstPosition, secondPosition
+        )
+    }
+
+    fun timeTravelToPoint(route: DrivingRoute, point: Point): Double {
+        val currentPosition = route.routePosition
+        val distance = distanceBetweenPointsOnRoute(route, currentPosition.point, point)
+        val targetPosition = currentPosition.advance(distance)
+        return targetPosition.timeToFinish() - currentPosition.timeToFinish()
+    }
+
 }

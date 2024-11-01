@@ -1,9 +1,11 @@
 package com.example.navigation
 
 import android.content.Context
+import android.system.Os.remove
 import android.view.View
 import android.widget.LinearLayout
 import android.widget.TextView
+import android.widget.Toast
 import androidx.cardview.widget.CardView
 import com.yandex.mapkit.Animation
 import com.yandex.mapkit.geometry.Point
@@ -15,6 +17,7 @@ import com.yandex.mapkit.map.GeoObjectSelectionMetadata
 import com.yandex.mapkit.map.IconStyle
 import com.yandex.mapkit.map.InputListener
 import com.yandex.mapkit.map.Map
+import com.yandex.mapkit.map.MapObject
 import com.yandex.mapkit.mapview.MapView
 import com.yandex.mapkit.search.Address
 import com.yandex.mapkit.search.Response
@@ -26,11 +29,12 @@ import com.yandex.mapkit.search.ToponymObjectMetadata
 import com.yandex.runtime.Error
 import com.yandex.runtime.image.ImageProvider
 
+
 class EeE(context: Context, mapView: MapView) {
 
     lateinit var cardView: LinearLayout
-    lateinit var cardViewFilter: CardView
     lateinit var info: LinearLayout
+    lateinit var cardViewFilter: CardView
     private val mapView = mapView
     lateinit var tvLatitude: TextView
     lateinit var tvLongutude: TextView
@@ -38,33 +42,67 @@ class EeE(context: Context, mapView: MapView) {
     private val context = context
 
     companion object {
-        @JvmStatic
-        var myLatitude = 0.0
-        @JvmStatic
-        var myLongitude = 0.0
-        @JvmStatic
-        var latitude = 0.0
-        @JvmStatic
-        var longitude = 0.0
-        @JvmStatic
-        var selectedPointLatitude = 0.0
-        @JvmStatic
-        var selectedPointLongitude: Double = 0.0
+        @JvmStatic var myLatitude = 0.0
+        @JvmStatic var myLongitude = 0.0
+        @JvmStatic var latitude = 0.0
+        @JvmStatic var longitude = 0.0
+        @JvmStatic var selectedPointLatitude = 0.0
+        @JvmStatic var selectedPointLongitude = 0.0
+        @JvmStatic var zoom: Float = 0f
     }
 
-    private var placemark = mapView.map.mapObjects.addPlacemark().apply {
+    private var placemark = mapView.mapWindow.map.mapObjects.addPlacemark().apply {
         geometry = Point(latitude, longitude)
         setIcon(ImageProvider.fromResource(context, R.drawable.selected_location))
     }
 
+    fun deleteCurrentPointPosition() {
+        if (placemark.isValid) {
+            mapView.mapWindow.map.mapObjects.remove(placemark as MapObject)
+        }
+    }
+    fun deleteWalkingRoute(){
+        if (Route.carPolylineMapObject != null){
+            if (Route.carPolylineMapObject!!.isValid){
+                mapView.mapWindow.map.mapObjects.remove(Route.carPolylineMapObject as MapObject)
+            }
+        }
+    }
+    fun deleteCarRoute(){
+        if (Route.walkPolylineMapObject != null){
+            if (Route.walkPolylineMapObject!!.isValid){
+                mapView.mapWindow.map.mapObjects.remove(Route.walkPolylineMapObject as MapObject)
+            }
+        }
+    }
+
     fun setPoint(latitude: Double, longitude: Double) {
-        placemark = mapView.map.mapObjects.addPlacemark().apply {
+        placemark = mapView.mapWindow.map.mapObjects.addPlacemark().apply {
             geometry = Point(latitude, longitude)
             setIcon(ImageProvider.fromResource(context, R.drawable.ic_me))
         }
     }
 
-    fun addTapAndInputListener(){
+    fun setCameraPosition(latitude: Double, longitude: Double) {
+        val cameraCallback = object : Map.CameraCallback {
+            override fun onMoveFinished(isFinished: Boolean) {
+                // Handle camera move finished ...
+            }
+        }
+
+        mapView.mapWindow.map.move(
+            CameraPosition(
+                /* target */ Point(latitude, longitude),
+                /* zoom */ 17f + zoom,
+                /* azimuth */ 0f,
+                /* tilt */ 0f,
+            ),
+            Animation(Animation.Type.LINEAR, 1f),
+            cameraCallback
+        )
+    }
+
+    fun addTapAndInputListener() {
         mapView.mapWindow.map.addInputListener(inputListener)
         mapView.mapWindow.map.addTapListener(tapListener)
     }
@@ -158,7 +196,7 @@ class EeE(context: Context, mapView: MapView) {
                 ?.components
                 ?.firstOrNull { it.kinds.contains(Address.Component.Kind.HOUSE) }
                 ?.name
-                ?:  ""
+                ?: ""
             val street = response.collection.children.firstOrNull()?.obj
                 ?.metadataContainer
                 ?.getItem(ToponymObjectMetadata::class.java)
@@ -176,33 +214,33 @@ class EeE(context: Context, mapView: MapView) {
                 ?.name
                 ?: ""
 
-            if (house != "" && street != ""){
+            if (house != "" && street != "") {
                 someInformation.text = "$street, $house"
-            }else if (house != ""){
+            } else if (house != "") {
                 someInformation.text = house
-            }else if (street != ""){
+            } else if (street != "") {
                 someInformation.text = street
-            }else if (city != "" && country != ""){
+            } else if (city != "" && country != "") {
                 tvLatitude.text = latitude.toString() + ","
                 tvLongutude.text = longitude.toString()
                 someInformation.text = "$city, $country"
-            }else if (city != ""){
+            } else if (city != "") {
                 tvLatitude.text = latitude.toString() + ","
                 tvLongutude.text = longitude.toString()
                 someInformation.text = city
-            }else if (place != "" && country != ""){
+            } else if (place != "" && country != "") {
                 tvLatitude.text = latitude.toString() + ","
                 tvLongutude.text = longitude.toString()
                 someInformation.text = "$place, $country"
-            }else if (place != ""){
+            } else if (place != "") {
                 tvLatitude.text = latitude.toString() + ","
                 tvLongutude.text = longitude.toString()
                 someInformation.text = place
-            }else if (country != ""){
+            } else if (country != "") {
                 tvLatitude.text = latitude.toString() + ","
                 tvLongutude.text = longitude.toString()
                 someInformation.text = country
-            }else if (hydro != ""){
+            } else if (hydro != "") {
                 tvLatitude.text = latitude.toString() + ","
                 tvLongutude.text = longitude.toString()
                 someInformation.text = hydro
@@ -214,45 +252,6 @@ class EeE(context: Context, mapView: MapView) {
         }
     }
 
-    fun showHide(show: Boolean) {
-        placemark = mapView.map.mapObjects.addPlacemark().apply {
-            geometry = Point(Mapkit.latitude, Mapkit.longitude)
-            setIcon(ImageProvider.fromResource(context, R.drawable.ic_me))
-        }
-        if (show) {
-            placemark.setIconStyle(
-                IconStyle().apply {
-                    visible = true
-                }
-            )
-        } else {
-            placemark.setIconStyle(
-                IconStyle().apply {
-                    visible = false
-                }
-            )
-        }
-    }
-
-    fun setCameraPosition(latitude: Double, longitude: Double) {
-        val cameraCallback = object : Map.CameraCallback {
-            override fun onMoveFinished(isFinished: Boolean) {
-                // Handle camera move finished ...
-            }
-        }
-
-        mapView.mapWindow.map.move(
-            CameraPosition(
-                /* target */ Point(latitude, longitude),
-                /* zoom */ 17f,
-                /* azimuth */ 0f,
-                /* tilt */ 0f,
-            ),
-            Animation(Animation.Type.LINEAR, 1f),
-            cameraCallback
-        )
-    }
-
     private val tapListener = object : GeoObjectTapListener {
         override fun onObjectTap(geoObjectTapEvent: GeoObjectTapEvent): Boolean {
             val selectionMetadata: GeoObjectSelectionMetadata = geoObjectTapEvent
@@ -260,8 +259,8 @@ class EeE(context: Context, mapView: MapView) {
                 .metadataContainer
                 .getItem(GeoObjectSelectionMetadata::class.java)
             mapView.mapWindow.map.selectGeoObject(selectionMetadata)
-            latitude = geoObjectTapEvent.geoObject.geometry[0].point!!.latitude
-            longitude = geoObjectTapEvent.geoObject.geometry[0].point!!.longitude
+            selectedPointLatitude = geoObjectTapEvent.geoObject.geometry[0].point!!.latitude
+            selectedPointLongitude = geoObjectTapEvent.geoObject.geometry[0].point!!.longitude
             cardView.visibility = View.VISIBLE
             return false
         }
@@ -269,6 +268,7 @@ class EeE(context: Context, mapView: MapView) {
 
     lateinit var searchSession1: Session
 
+    val route = Route(mapView, context)
     private val inputListener = object : InputListener {
         override fun onMapTap(map: Map, point: Point) {
             cardViewFilter.visibility = View.GONE
@@ -276,21 +276,15 @@ class EeE(context: Context, mapView: MapView) {
             val searchManager =
                 SearchFactory.getInstance().createSearchManager(SearchManagerType.COMBINED)
             searchSession1 = searchManager.submit(point, 20, SearchOptions(), searchListener)
-
-//            latitude = placemark.geometry.latitude
-//            longitude = placemark.geometry.longitude
-//            cardView.visibility = View.VISIBLE
-//            tvLatitude.text = latitude.toString()
-//            tvLongutude.text = longitude.toString()
+            isRouteHave()
         }
 
         override fun onMapLongTap(map: Map, point: Point) {
             cardViewFilter.visibility = View.GONE
+            info.visibility = View.VISIBLE;
             selectedPointLatitude = point.latitude
             selectedPointLongitude = point.longitude
-            map.mapObjects.clear()
-            setPoint(myLatitude, myLongitude)
-            setSelectedPoint(point.latitude, point.longitude)
+            isRouteHave()
 
             val searchManager =
                 SearchFactory.getInstance().createSearchManager(SearchManagerType.COMBINED)
@@ -305,9 +299,21 @@ class EeE(context: Context, mapView: MapView) {
         }
     }
 
+    private fun isRouteHave() {
+        mapView.mapWindow.map.mapObjects.clear()
+        setPoint(myLatitude, myLongitude)
+        setSelectedPoint(selectedPointLatitude, selectedPointLongitude)
+        if (Route.walkRoute) {
+            route.setWalkingRoute()
+        }
+        if (Route.carRoute) {
+            route.setCarRoute()
+        }
+    }
+
     fun setSelectedPoint(latitude: Double, longitude: Double) {
-        if (latitude != 0.0 && longitude != 0.0){
-            placemark = mapView.mapWindow.map.mapObjects.addPlacemark().apply {
+        if (latitude != 0.0 && longitude != 0.0) {
+            val selectedPoint = mapView.mapWindow.map.mapObjects.addPlacemark().apply {
                 geometry = Point(latitude, longitude)
                 setIcon(ImageProvider.fromResource(context, R.drawable.selected_location))
             }

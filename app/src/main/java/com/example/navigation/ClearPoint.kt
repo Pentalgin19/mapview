@@ -16,5 +16,6 @@ class ClearPoint(context1: Context, mapView1: MapView) {
     private fun setMyPositionAndSelectedPoint() {
         eee.setPoint(EeE.myLatitude, EeE.myLongitude)
         eee.setSelectedPoint(EeE.selectedPointLatitude, EeE.selectedPointLongitude)
+
     }
 }

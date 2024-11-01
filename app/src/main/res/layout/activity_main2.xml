@@ -1,24 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <com.yandex.mapkit.mapview.MapView
+        android:id="@+id/mapView"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
-
-        <com.yandex.mapkit.mapview.MapView
-            android:id="@+id/mapView"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-    </androidx.constraintlayout.widget.ConstraintLayout>
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
 
     <ImageButton
         android:id="@+id/btnShowResults"
@@ -48,7 +42,8 @@
         android:maxLines="1"
         android:minHeight="48dp"
         android:paddingStart="19dp"
-        android:textColorHint="@color/_4A4A6A"
+        android:textColorHint="#848484"
+        android:textColor="#848484"
         app:layout_constraintEnd_toStartOf="@+id/btnShowResults"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -72,6 +67,7 @@
             android:src="@drawable/plus_icon" />
 
         <ImageButton
+            android:id="@+id/btnMinusMash"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
@@ -82,110 +78,103 @@
 
     </LinearLayout>
 
-    <com.google.android.material.appbar.AppBarLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/navBar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:animateLayoutChanges="true"
         android:background="@color/white"
         android:visibility="visible"
         app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent">
 
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:layout_width="match_parent"
+        <ImageButton
+            android:id="@+id/btnShowWalkingRoute"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="@color/white"
-            android:orientation="horizontal"
+            android:backgroundTint="@android:color/transparent"
+            android:paddingHorizontal="7dp"
+            android:src="@drawable/people_icon"
+            app:layout_constraintBottom_toTopOf="@+id/tvWalkRoute"
+            app:layout_constraintEnd_toStartOf="@+id/showMyPosition"
             app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/tvWalkRoute"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/sora"
+            android:text="Пешком"
+            android:textColor="@color/_3F434A"
+            android:textSize="10sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="@id/btnShowWalkingRoute"
+            app:layout_constraintStart_toStartOf="@id/btnShowWalkingRoute"
+            app:layout_constraintTop_toBottomOf="@+id/btnShowWalkingRoute" />
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/showMyPosition"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/btnShowCarRoute"
+            app:layout_constraintStart_toEndOf="@+id/btnShowWalkingRoute"
             app:layout_constraintTop_toTopOf="parent">
 
             <ImageButton
-                android:id="@+id/btnShowWalkingRoute"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:backgroundTint="@android:color/transparent"
-                android:paddingHorizontal="7dp"
-                android:src="@drawable/people_icon"
-                app:layout_constraintBottom_toTopOf="@+id/tvWalkRoute"
-                app:layout_constraintEnd_toStartOf="@+id/btnShowMyPosition"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
-
-            <TextView
-                android:id="@+id/tvWalkRoute"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:fontFamily="@font/sora"
-                android:text="Пешком"
-                android:textColor="@color/_3F434A"
-                android:textSize="10sp"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="@id/btnShowWalkingRoute"
-                app:layout_constraintStart_toStartOf="@id/btnShowWalkingRoute"
-                app:layout_constraintTop_toBottomOf="@+id/btnShowWalkingRoute" />
-
-            <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/btnShowMyPosition"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="10dp"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toStartOf="@+id/btnShowCarRoute"
-                app:layout_constraintStart_toEndOf="@+id/btnShowWalkingRoute"
-                app:layout_constraintTop_toTopOf="parent">
-
-                <ImageButton
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginHorizontal="5dp"
-                    android:layout_marginBottom="20dp"
-                    android:background="@drawable/btn_current_location"
-                    android:minWidth="65dp"
-                    android:minHeight="65dp"
-                    android:paddingHorizontal="7dp"
-                    android:src="@drawable/current_position_icon"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
-
-            </androidx.constraintlayout.widget.ConstraintLayout>
-
-            <ImageButton
-                android:id="@+id/btnShowCarRoute"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="7dp"
-                android:backgroundTint="@android:color/transparent"
-                android:minWidth="22dp"
-                android:minHeight="22dp"
+                android:layout_marginHorizontal="5dp"
+                android:layout_marginBottom="20dp"
+                android:background="@drawable/btn_current_location"
+                android:minWidth="65dp"
+                android:minHeight="65dp"
                 android:paddingHorizontal="7dp"
-                android:src="@drawable/car_icon"
-                app:layout_constraintBottom_toTopOf="@id/tvCarRoute"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toEndOf="@+id/btnShowMyPosition"
+                android:src="@drawable/current_position_icon"
+                app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
-            <TextView
-                android:id="@+id/tvCarRoute"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:fontFamily="@font/sora"
-                android:text="Пешком"
-                android:textColor="@color/_3F434A"
-                android:textSize="10sp"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="@id/btnShowCarRoute"
-                app:layout_constraintStart_toStartOf="@id/btnShowCarRoute"
-                app:layout_constraintTop_toBottomOf="@+id/btnShowCarRoute" />
-
         </androidx.constraintlayout.widget.ConstraintLayout>
-    </com.google.android.material.appbar.AppBarLayout>
+
+        <ImageButton
+            android:id="@+id/btnShowCarRoute"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="7dp"
+            android:backgroundTint="@android:color/transparent"
+            android:minWidth="22dp"
+            android:minHeight="22dp"
+            android:paddingHorizontal="7dp"
+            android:src="@drawable/car_icon"
+            app:layout_constraintBottom_toTopOf="@id/tvCarRoute"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/showMyPosition"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/tvCarRoute"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/sora"
+            android:text="На машине"
+            android:textColor="@color/_3F434A"
+            android:textSize="10sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="@id/btnShowCarRoute"
+            app:layout_constraintStart_toStartOf="@id/btnShowCarRoute"
+            app:layout_constraintTop_toBottomOf="@+id/btnShowCarRoute" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/ll"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="20dp"
+        android:layout_marginBottom="35dp"
         android:background="@drawable/info_bar"
         app:backgroundTint="@null"
         app:layout_constraintBottom_toTopOf="@+id/navBar"
@@ -196,16 +185,18 @@
             android:id="@+id/info"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:visibility="visible"
+            android:orientation="vertical"
             android:padding="15dp"
-            android:orientation="vertical">
+            android:visibility="gone">
+
             <TextView
                 android:id="@+id/someInformation"
                 android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:fontFamily="@font/sora"
-                android:textSize="13sp"
                 android:textColor="@color/_1E1E1E"
-                android:layout_height="wrap_content" />
+                android:textSize="13sp" />
+
             <LinearLayout
                 android:id="@+id/llLatitudeLongitude"
                 android:layout_width="match_parent"
@@ -222,16 +213,16 @@
 
                 <TextView
                     android:id="@+id/latitude"
-                    android:layout_gravity="center_vertical"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
                     android:layout_marginStart="3dp" />
 
                 <TextView
                     android:id="@+id/longitude"
-                    android:layout_gravity="center_vertical"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
                     android:layout_marginStart="5dp" />
             </LinearLayout>
 
@@ -252,158 +243,174 @@
 
     <androidx.cardview.widget.CardView
         android:id="@+id/cardViewFilter"
-        android:visibility="gone"
         android:layout_width="match_parent"
         android:layout_height="400dp"
         android:background="@drawable/cardview_back"
+        android:visibility="gone"
+        app:cardElevation="500dp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" >
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
+
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:padding="25dp">
+
             <TextView
                 android:id="@+id/where"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
                 android:fontFamily="@font/sora"
-                android:textStyle="bold"
+                android:text="Куда сходить?"
                 android:textSize="16sp"
-                android:text="Куда сходить?"/>
+                android:textStyle="bold"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
             <GridLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                app:layout_constraintTop_toBottomOf="@+id/where"
-                app:layout_constraintStart_toStartOf="parent"
                 android:layout_marginTop="25dp"
+                android:columnCount="4"
                 android:rowCount="2"
-                android:columnCount="4">
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/where">
+
                 <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="16dp"
                     android:orientation="vertical">
+
                     <ImageButton
                         android:id="@+id/btnCafe"
-                        android:layout_height="wrap_content"
                         android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
                         android:layout_gravity="center_vertical"
                         android:background="@android:color/transparent"
-                        android:src="@drawable/cafe"/>
+                        android:src="@drawable/cafe" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center_horizontal"
-                        android:textSize="13sp"
-                        android:text="Кафе"/>
+                        android:text="Кафе"
+                        android:textSize="13sp" />
                 </LinearLayout>
+
                 <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="16dp"
                     android:orientation="vertical">
+
                     <ImageButton
                         android:id="@+id/btnGasoline"
-                        android:layout_height="wrap_content"
                         android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
                         android:layout_gravity="center_vertical"
                         android:background="@android:color/transparent"
-                        android:src="@drawable/gasoline"/>
+                        android:src="@drawable/gasoline" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center_horizontal"
-                        android:textSize="13sp"
-                        android:text="АЗС"/>
+                        android:text="АЗС"
+                        android:textSize="13sp" />
                 </LinearLayout>
+
                 <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="16dp"
                     android:orientation="vertical">
+
                     <ImageButton
                         android:id="@+id/btnPark"
-                        android:layout_height="wrap_content"
                         android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
                         android:layout_gravity="center_vertical"
                         android:background="@android:color/transparent"
-                        android:src="@drawable/park"/>
+                        android:src="@drawable/park" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center_horizontal"
-                        android:textSize="13sp"
-                        android:text="Парки"/>
+                        android:text="Парки"
+                        android:textSize="13sp" />
                 </LinearLayout>
+
                 <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="16dp"
                     android:orientation="vertical">
+
                     <ImageButton
                         android:id="@+id/btnHospital"
-                        android:layout_height="wrap_content"
                         android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
                         android:layout_gravity="center_vertical"
                         android:background="@android:color/transparent"
-                        android:src="@drawable/hospital"/>
+                        android:src="@drawable/hospital" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center_horizontal"
-                        android:textSize="13sp"
-                        android:text="Больницы"/>
+                        android:text="Больницы"
+                        android:textSize="13sp" />
                 </LinearLayout>
+
                 <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginEnd="16dp"
                     android:layout_marginTop="16dp"
+                    android:layout_marginEnd="16dp"
                     android:orientation="vertical">
+
                     <ImageButton
                         android:id="@+id/btnHotel"
-                        android:layout_height="wrap_content"
                         android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
                         android:layout_gravity="center_vertical"
                         android:background="@android:color/transparent"
-                        android:src="@drawable/hotel"/>
+                        android:src="@drawable/hotel" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center_horizontal"
-                        android:textSize="13sp"
-                        android:text="Отели"/>
+                        android:text="Отели"
+                        android:textSize="13sp" />
                 </LinearLayout>
+
                 <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginEnd="16dp"
                     android:layout_marginTop="16dp"
+                    android:layout_marginEnd="16dp"
                     android:orientation="vertical">
+
                     <ImageButton
                         android:id="@+id/btnStar"
-                        android:layout_height="wrap_content"
                         android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
                         android:layout_gravity="center_vertical"
                         android:background="@android:color/transparent"
-                        android:src="@drawable/star"/>
+                        android:src="@drawable/star" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center_horizontal"
-                        android:textSize="13sp"
+                        android:text="Что\nпосетить"
                         android:textAlignment="center"
-                        android:text="Что\nпосетить"/>
+                        android:textSize="13sp" />
                 </LinearLayout>
             </GridLayout>
         </androidx.constraintlayout.widget.ConstraintLayout>
