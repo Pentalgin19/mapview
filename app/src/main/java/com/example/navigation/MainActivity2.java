@@ -18,15 +18,11 @@ import androidx.core.app.ActivityCompat;
 
 import com.example.navigation.databinding.ActivityMain2Binding;
 import com.yandex.mapkit.MapKitFactory;
-import com.yandex.mapkit.geometry.Point;
-import com.yandex.mapkit.map.MapObject;
-import com.yandex.mapkit.map.PlacemarkMapObject;
 import com.yandex.mapkit.mapview.MapView;
 import com.yandex.mapkit.search.SearchFactory;
 import com.yandex.mapkit.search.SearchManager;
 import com.yandex.mapkit.search.SearchManagerType;
-import com.yandex.mapkit.search.Session;
-import com.yandex.runtime.image.ImageProvider;
+import com.yandex.mapkit.user_location.UserLocationLayer;
 
 public class MainActivity2 extends Activity {
     public Double lat = 0.00000;
@@ -39,13 +35,13 @@ public class MainActivity2 extends Activity {
     private MapView mapView;
     private String search = null;
     private SearchManager searchManager;
-    private Session searchSession;
     public Mapkit mapkit;
     private Boolean showWhereIAM = true;
     private boolean enabled;
-    private EeE eee;
+    private PointObj pointObj;
     private ClearPoint clearPoint;
     private Route route;
+    private UserLocationLayer userLocationLayer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,14 +56,19 @@ public class MainActivity2 extends Activity {
         mapView = binding.mapView;
         mapkit = new Mapkit(mapView, this, this, binding.edSearch);
 
-        eee = new EeE(this, mapView);
-        eee.cardView = binding.ll;
-        eee.tvLatitude = binding.latitude;
-        eee.tvLongutude = binding.longitude;
-        eee.someInformation = binding.someInformation;
-        eee.addTapAndInputListener();
-        eee.info = binding.info;
-        eee.cardViewFilter = binding.cardViewFilter;
+        pointObj = new PointObj(this, mapView);
+        pointObj.cardView = binding.ll;
+        pointObj.tvLatitude = binding.latitude;
+        pointObj.tvLongutude = binding.longitude;
+        pointObj.someInformation = binding.someInformation;
+        pointObj.addTapAndInputListener();
+        pointObj.info = binding.info;
+        pointObj.cardViewFilter = binding.cardViewFilter;
+
+
+        route = new Route(mapView, this);
+        Route.setTvTime(binding.tvTime);
+        Route.setTvLenght(binding.tvLength);
 
         clearPoint = new ClearPoint(this, mapView);
 
@@ -79,7 +80,7 @@ public class MainActivity2 extends Activity {
             }
             if (search != null && !search.isEmpty()) {
                 mapkit.setE(true);
-                mapkit.loc();
+                mapkit.subQuery();
             }
         });
 
@@ -88,8 +89,6 @@ public class MainActivity2 extends Activity {
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
                 if( event != null && event.getKeyCode() == KeyEvent.KEYCODE_ENTER){
                     search = v.getText().toString();
-                    Toast.makeText(MainActivity2.this, search, Toast.LENGTH_SHORT).show();
-                    // обработка нажатия Enter
                     return true;
                 }
                 return false;
@@ -122,32 +121,39 @@ public class MainActivity2 extends Activity {
         mapkit.requestLocationPermission();
 
         binding.btnShowMyPosition.setOnClickListener(v -> {
-            eee.setCameraPosition(lat, lon);
+            pointObj.setCameraPosition(lat, lon);
         });
 
-        route = new Route(mapView, this);
-
         binding.btnShowWalkingRoute.setOnClickListener(v -> {
+            binding.timeLength.setVisibility(View.VISIBLE);
             if (Route.getCarRoute()){
-                eee.deleteCarRoute();
+                pointObj.deleteCarRoute();
+                pointObj.deleteCarRoute1();
             }
+            pointObj.deleteWalkingRoute();
+            pointObj.deleteWalkingRoute1();
             mapkit.setWalkingRoute();
         });
 
         binding.btnShowCarRoute.setOnClickListener(v -> {
+            binding.timeLength.setVisibility(View.VISIBLE);
             if (Route.getWalkRoute()){
-                eee.deleteWalkingRoute();
+                pointObj.deleteWalkingRoute();
+                pointObj.deleteWalkingRoute1();
             }
+            pointObj.deleteCarRoute();
+            pointObj.deleteCarRoute1();
             mapkit.setCarRoute();
         });
 
         btnShowTrafficJams.setOnClickListener(v -> {
-            EeE.setZoom(EeE.getZoom() + 1f);
-            eee.setCameraPosition(lat, lon);
+            PointObj.setZoom(PointObj.getZoom() + 1f);
+            pointObj.setCameraPosition(lat, lon);
         });
+
         binding.btnMinusMash.setOnClickListener(v -> {
-            EeE.setZoom(EeE.getZoom() - 1f);
-            eee.setCameraPosition(lat, lon);
+            PointObj.setZoom(PointObj.getZoom() - 1f);
+            pointObj.setCameraPosition(lat, lon);
         });
 
         binding.btnCafe.setOnClickListener(v -> {
@@ -155,48 +161,50 @@ public class MainActivity2 extends Activity {
             binding.edSearch.setText("Кафе");
             binding.cardViewFilter.setVisibility(View.GONE);
             mapkit.setE(true);
-            mapkit.loc();
+            mapkit.subQuery();
         });
         binding.btnGasoline.setOnClickListener(v -> {
             search = "заправка";
             binding.edSearch.setText("Заправка");
             binding.cardViewFilter.setVisibility(View.GONE);
             mapkit.setE(true);
-            mapkit.loc();
+            mapkit.subQuery();
         });
         binding.btnPark.setOnClickListener(v -> {
             search = "парк";
             binding.edSearch.setText("Парк");
             binding.cardViewFilter.setVisibility(View.GONE);
             mapkit.setE(true);
-            mapkit.loc();
+            mapkit.subQuery();
         });
         binding.btnHospital.setOnClickListener(v -> {
             search = "hospital";
             binding.edSearch.setText("Больница");
             binding.cardViewFilter.setVisibility(View.GONE);
             mapkit.setE(true);
-            mapkit.loc();
+            mapkit.subQuery();
         });
         binding.btnHotel.setOnClickListener(v -> {
             search = "отель";
             binding.edSearch.setText("Отель");
             binding.cardViewFilter.setVisibility(View.GONE);
             mapkit.setE(true);
-            mapkit.loc();
+            mapkit.subQuery();
         });
         binding.btnStar.setOnClickListener(v -> {
             search = "Что посмотреть";
             binding.edSearch.setText("Что посмотреть");
             binding.cardViewFilter.setVisibility(View.GONE);
             mapkit.setE(true);
-            mapkit.loc();
+            mapkit.subQuery();
         });
-    }
-    void deletePoint(MapObject mapObject){
-        if (mapObject.isValid()){
-            mapView.getMapWindow().getMap().getMapObjects().remove((MapObject) mapObject);
-        }
+        binding.btnCross.setOnClickListener(v -> {
+            if (binding.info.getVisibility() == View.GONE){
+                binding.info.setVisibility(View.VISIBLE);
+            }else{
+                binding.info.setVisibility(View.GONE);
+            }
+        });
     }
 
     @Override
@@ -228,24 +236,28 @@ public class MainActivity2 extends Activity {
             if (enabled) {
                 Mapkit.setLatitude(location.getLatitude());
                 Mapkit.setLongitude(location.getLongitude());
-                EeE.setMyLatitude(location.getLatitude());
-                EeE.setMyLongitude(location.getLongitude());
+                PointObj.setMyLatitude(location.getLatitude());
+                PointObj.setMyLongitude(location.getLongitude());
 
-                eee.deleteCurrentPointPosition();
-                eee.setPoint(location.getLatitude(), location.getLongitude());
+                mapkit.tt();
 
                 if (Route.getCarRoute()){
-                    eee.deleteCarRoute();
+                    route.setCarRoute1();
+                    pointObj.deleteCarRoute();
                     route.setCarRoute();
+                    pointObj.deleteCarRoute1();
                 }
+
                 if (Route.getWalkRoute()){
-                    eee.deleteWalkingRoute();
+                    route.setWalkingRoute1();
+                    pointObj.deleteWalkingRoute();
                     route.setWalkingRoute();
+                    pointObj.deleteWalkingRoute1();
                 }
                 lat = location.getLatitude();
                 lon = location.getLongitude();
                 if (showWhereIAM) {
-                    eee.setCameraPosition(lat, lon);
+                    pointObj.setCameraPosition(lat, lon);
                     showWhereIAM = false;
                 }
             }
@@ -282,5 +294,4 @@ public class MainActivity2 extends Activity {
         mapView.onStop();
         super.onStop();
     }
-
 }

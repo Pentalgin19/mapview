@@ -1,11 +1,9 @@
 package com.example.navigation
 
 import android.content.Context
-import android.system.Os.remove
 import android.view.View
 import android.widget.LinearLayout
 import android.widget.TextView
-import android.widget.Toast
 import androidx.cardview.widget.CardView
 import com.yandex.mapkit.Animation
 import com.yandex.mapkit.geometry.Point
@@ -14,10 +12,10 @@ import com.yandex.mapkit.layers.GeoObjectTapEvent
 import com.yandex.mapkit.layers.GeoObjectTapListener
 import com.yandex.mapkit.map.CameraPosition
 import com.yandex.mapkit.map.GeoObjectSelectionMetadata
-import com.yandex.mapkit.map.IconStyle
 import com.yandex.mapkit.map.InputListener
 import com.yandex.mapkit.map.Map
 import com.yandex.mapkit.map.MapObject
+import com.yandex.mapkit.map.PlacemarkMapObject
 import com.yandex.mapkit.mapview.MapView
 import com.yandex.mapkit.search.Address
 import com.yandex.mapkit.search.Response
@@ -30,7 +28,7 @@ import com.yandex.runtime.Error
 import com.yandex.runtime.image.ImageProvider
 
 
-class EeE(context: Context, mapView: MapView) {
+class PointObj(context: Context, mapView: MapView) {
 
     lateinit var cardView: LinearLayout
     lateinit var info: LinearLayout
@@ -72,6 +70,20 @@ class EeE(context: Context, mapView: MapView) {
         if (Route.walkPolylineMapObject != null){
             if (Route.walkPolylineMapObject!!.isValid){
                 mapView.mapWindow.map.mapObjects.remove(Route.walkPolylineMapObject as MapObject)
+            }
+        }
+    }
+    fun deleteWalkingRoute1(){
+        if (Route.carPolylineMapObject1 != null){
+            if (Route.carPolylineMapObject1!!.isValid){
+                mapView.mapWindow.map.mapObjects.remove(Route.carPolylineMapObject1 as MapObject)
+            }
+        }
+    }
+    fun deleteCarRoute1(){
+        if (Route.walkPolylineMapObject1 != null){
+            if (Route.walkPolylineMapObject1!!.isValid){
+                mapView.mapWindow.map.mapObjects.remove(Route.walkPolylineMapObject1 as MapObject)
             }
         }
     }
@@ -273,10 +285,18 @@ class EeE(context: Context, mapView: MapView) {
         override fun onMapTap(map: Map, point: Point) {
             cardViewFilter.visibility = View.GONE
             info.visibility = View.VISIBLE;
+            selectedPointLatitude = point.latitude
+            selectedPointLongitude = point.longitude
+            isRouteHave()
+            setSelectedPoint(point.latitude, point.longitude)
             val searchManager =
                 SearchFactory.getInstance().createSearchManager(SearchManagerType.COMBINED)
             searchSession1 = searchManager.submit(point, 20, SearchOptions(), searchListener)
-            isRouteHave()
+
+            latitude = point.latitude
+            longitude = point.longitude
+            tvLatitude.text = latitude.toString()
+            tvLongutude.text = longitude.toString()
         }
 
         override fun onMapLongTap(map: Map, point: Point) {
@@ -285,35 +305,47 @@ class EeE(context: Context, mapView: MapView) {
             selectedPointLatitude = point.latitude
             selectedPointLongitude = point.longitude
             isRouteHave()
+            setSelectedPoint(point.latitude, point.longitude)
 
             val searchManager =
                 SearchFactory.getInstance().createSearchManager(SearchManagerType.COMBINED)
             searchSession1 = searchManager.submit(point, 20, SearchOptions(), searchListener)
 
-
             latitude = placemark.geometry.latitude
             longitude = placemark.geometry.longitude
             cardView.visibility = View.VISIBLE
-            tvLatitude.text = latitude.toString()
-            tvLongutude.text = longitude.toString()
+            tvLatitude.text = point.latitude.toString()
+            tvLongutude.text = point.longitude.toString()
         }
     }
 
     private fun isRouteHave() {
-        mapView.mapWindow.map.mapObjects.clear()
-        setPoint(myLatitude, myLongitude)
-        setSelectedPoint(selectedPointLatitude, selectedPointLongitude)
+        deleteSelectedPoint()
         if (Route.walkRoute) {
+            deleteWalkingRoute()
+            deleteWalkingRoute1()
             route.setWalkingRoute()
         }
         if (Route.carRoute) {
+            deleteCarRoute()
+            deleteCarRoute1()
             route.setCarRoute()
         }
     }
 
+    private fun deleteSelectedPoint() {
+        if (selectedPoint != null){
+            if (selectedPoint.isValid){
+                mapView.mapWindow.map.mapObjects.remove(selectedPoint)
+            }
+        }
+    }
+
+    var selectedPoint: PlacemarkMapObject = mapView.mapWindow.map.mapObjects.addPlacemark()
+
     fun setSelectedPoint(latitude: Double, longitude: Double) {
         if (latitude != 0.0 && longitude != 0.0) {
-            val selectedPoint = mapView.mapWindow.map.mapObjects.addPlacemark().apply {
+            selectedPoint = mapView.mapWindow.map.mapObjects.addPlacemark().apply {
                 geometry = Point(latitude, longitude)
                 setIcon(ImageProvider.fromResource(context, R.drawable.selected_location))
             }

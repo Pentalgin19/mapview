@@ -45,7 +45,7 @@ class NavKit(context: Context, mapView: MapView) {
     fun optimalRoute() {
         val requestPoints = listOf(
             RequestPoint(
-                Point(EeE.myLatitude, EeE.myLongitude),
+                Point(PointObj.myLatitude, PointObj.myLongitude),
                 RequestPointType.WAYPOINT,
                 null,
                 null

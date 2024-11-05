@@ -9,24 +9,14 @@ import android.widget.EditText
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import com.yandex.mapkit.MapKitFactory
-import com.yandex.mapkit.RequestPoint
-import com.yandex.mapkit.RequestPointType
-import com.yandex.mapkit.directions.DirectionsFactory
-import com.yandex.mapkit.directions.driving.DrivingOptions
-import com.yandex.mapkit.directions.driving.DrivingRoute
-import com.yandex.mapkit.directions.driving.DrivingRouter
-import com.yandex.mapkit.directions.driving.DrivingRouterType
-import com.yandex.mapkit.directions.driving.DrivingSession
-import com.yandex.mapkit.directions.driving.VehicleOptions
 import com.yandex.mapkit.geometry.Point
-import com.yandex.mapkit.geometry.Polyline
-import com.yandex.mapkit.geometry.SubpolylineHelper
 import com.yandex.mapkit.layers.ObjectEvent
 import com.yandex.mapkit.map.CameraListener
 import com.yandex.mapkit.map.CameraPosition
 import com.yandex.mapkit.map.CameraUpdateReason
+import com.yandex.mapkit.map.IconStyle
 import com.yandex.mapkit.map.Map
-import com.yandex.mapkit.map.MapObjectCollection
+import com.yandex.mapkit.map.RotationType
 import com.yandex.mapkit.map.VisibleRegionUtils
 import com.yandex.mapkit.mapview.MapView
 import com.yandex.mapkit.search.Response
@@ -35,17 +25,6 @@ import com.yandex.mapkit.search.SearchManager
 import com.yandex.mapkit.search.SearchManagerType
 import com.yandex.mapkit.search.SearchOptions
 import com.yandex.mapkit.search.Session
-import com.yandex.mapkit.transport.TransportFactory
-import com.yandex.mapkit.transport.masstransit.FilterVehicleTypes
-import com.yandex.mapkit.transport.masstransit.FitnessOptions
-import com.yandex.mapkit.transport.masstransit.MasstransitRouter
-import com.yandex.mapkit.transport.masstransit.Route
-import com.yandex.mapkit.transport.masstransit.RouteOptions
-import com.yandex.mapkit.transport.masstransit.SectionMetadata.SectionData
-import com.yandex.mapkit.transport.masstransit.Session.RouteListener
-import com.yandex.mapkit.transport.masstransit.TimeOptions
-import com.yandex.mapkit.transport.masstransit.TransitOptions
-import com.yandex.mapkit.transport.masstransit.Transport
 import com.yandex.mapkit.user_location.UserLocationObjectListener
 import com.yandex.mapkit.user_location.UserLocationView
 import com.yandex.runtime.Error
@@ -65,7 +44,7 @@ class Mapkit(
     }
 
     private val mapView = mapView
-    private var eee: EeE = EeE(context, mapView)
+    private var pointObj: PointObj = PointObj(context, mapView)
     private val route = Route(mapView, context)
 
     private val mapkit = MapKitFactory.getInstance()
@@ -73,7 +52,6 @@ class Mapkit(
     private var locationMapkit = mapkit.createUserLocationLayer(mapView.mapWindow)
     private lateinit var searchManager: SearchManager
     private lateinit var session: Session
-    private var check = false
 
     private var routeStartLocation = Point(0.0000, 0.000)
     private var routeEndLocation = Point(51.770846, 55.123653)//51.770846, 55.123653
@@ -82,7 +60,7 @@ class Mapkit(
         (routeStartLocation.longitude + routeEndLocation.longitude) / 2,
     )
 
-    fun loc() {
+    fun subQuery() {
         locationMapkit.setObjectListener(this)
         searchManager = SearchFactory.getInstance().createSearchManager(SearchManagerType.COMBINED)
         mapView.mapWindow.map.addCameraListener(this)
@@ -92,6 +70,11 @@ class Mapkit(
             }
             false
         }
+    }
+    fun tt(){
+        locationMapkit.isVisible = true
+        locationMapkit.isHeadingEnabled = true
+        locationMapkit.setObjectListener(this)
     }
 
     private var t = false
@@ -137,6 +120,10 @@ class Mapkit(
     }
 
     override fun onObjectAdded(userLocationView: UserLocationView) {
+        val icon = com.example.navigation.R.drawable.ic_me
+        userLocationView.arrow.setIcon(ImageProvider.fromResource(context, icon),
+            IconStyle().setRotationType(RotationType.ROTATE)
+        )
         userLocationView.accuracyCircle.fillColor = Color.TRANSPARENT
     }
 
@@ -159,7 +146,7 @@ class Mapkit(
                     com.yandex.maps.mobile.R.drawable.search_layer_pin_icon_default
                 )
             )
-            eee.setCameraPosition(resultLocation.latitude, resultLocation.longitude)
+            pointObj.setCameraPosition(resultLocation.latitude, resultLocation.longitude)
         }
     }
 

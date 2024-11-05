@@ -6,7 +6,7 @@ import com.yandex.mapkit.mapview.MapView
 class ClearPoint(context1: Context, mapView1: MapView) {
     private val context = context1
     private val mapView = mapView1
-    private val eee = EeE(context, mapView)
+    private val pointObj = PointObj(context, mapView)
 
     fun clearSetPoint() {
         mapView.mapWindow.map.mapObjects.clear()
@@ -14,8 +14,8 @@ class ClearPoint(context1: Context, mapView1: MapView) {
     }
 
     private fun setMyPositionAndSelectedPoint() {
-        eee.setPoint(EeE.myLatitude, EeE.myLongitude)
-        eee.setSelectedPoint(EeE.selectedPointLatitude, EeE.selectedPointLongitude)
+        pointObj.setPoint(PointObj.myLatitude, PointObj.myLongitude)
+        pointObj.setSelectedPoint(PointObj.selectedPointLatitude, PointObj.selectedPointLongitude)
 
     }
 }
