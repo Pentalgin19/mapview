@@ -261,14 +261,12 @@ public class MainActivity2 extends Activity {
                 }
 
                 if (Route.getCarRoute()){
-                    mapView.getMapWindow().getMap().getMapObjects().clear();
                     mapkit.showUserPin();
                     pointObj.setSelectedPoint(PointObj.getSelectedPointLatitude(), PointObj.getSelectedPointLongitude());
                     route.setCarRoute();
                 }
 
                 if (Route.getWalkRoute()){
-                    pointObj.deleteAllRoute();
                     mapkit.showUserPin();
                     pointObj.setSelectedPoint(PointObj.getSelectedPointLatitude(), PointObj.getSelectedPointLongitude());
                     route.setWalkingRoute();
