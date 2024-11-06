@@ -39,8 +39,10 @@ class Mapkit(
 ) : UserLocationObjectListener,
     Session.SearchListener, CameraListener {
     companion object {
-        @JvmStatic var latitude: Double = 0.0000
-        @JvmStatic var longitude: Double = 0.0000
+        @JvmStatic
+        var latitude: Double = 0.0000
+        @JvmStatic
+        var longitude: Double = 0.0000
     }
 
     private val mapView = mapView
@@ -60,22 +62,40 @@ class Mapkit(
         (routeStartLocation.longitude + routeEndLocation.longitude) / 2,
     )
 
-    fun subQuery() {
+    fun subQuery(string: String) {
         locationMapkit.setObjectListener(this)
         searchManager = SearchFactory.getInstance().createSearchManager(SearchManagerType.COMBINED)
         mapView.mapWindow.map.addCameraListener(this)
         searchEditText.setOnEditorActionListener { _, i, _ ->
             if (i == EditorInfo.IME_ACTION_SEARCH) {
-                if (searchEditText.text.toString() == "ОКЭИ 105 кабинет"){
-                    submitQuery("улица Чкалова 11")
-                }else{
+                Toast.makeText(context, string, Toast.LENGTH_SHORT).show()
+                if (string == "Оренбургский колледж экономики и информатики " ||
+                    string == "ОКЭИ " ||
+                    string == "ОКЭИ 105 кабинет "
+                ) {
+                    Toast.makeText(context, "iii", Toast.LENGTH_SHORT).show()
+                    submitQuery("Оренбург, улица Чкалова 11")
+                } else {
                     submitQuery(searchEditText.text.toString())
                 }
+            }
+            if (string == "Оренбургский колледж экономики и информатики " ||
+                string == "ОКЭИ " ||
+                string == "ОКЭИ 105 кабинет "
+            ) {
+                Toast.makeText(context, "iii", Toast.LENGTH_SHORT).show()
+                submitQuery("Оренбург, улица Чкалова 11")
+                PointObj.selectedPointLatitude = 51.765334
+                PointObj.selectedPointLongitude = 55.124147
+                route.setWalkingRoute()
+            } else {
+                submitQuery(searchEditText.text.toString())
             }
             false
         }
     }
-    fun showUserPin(){
+
+    fun showUserPin() {
         locationMapkit.isVisible = true
         locationMapkit.isHeadingEnabled = true
         locationMapkit.setObjectListener(this)
@@ -93,7 +113,7 @@ class Mapkit(
     }
 
     var e = true
-    private fun submitQuery(query: String) {
+    fun submitQuery(query: String) {
         if (e) {
             session = searchManager.submit(
                 query,
@@ -125,7 +145,8 @@ class Mapkit(
 
     override fun onObjectAdded(userLocationView: UserLocationView) {
         val icon = com.example.navigation.R.drawable.ic_me
-        userLocationView.arrow.setIcon(ImageProvider.fromResource(context, icon),
+        userLocationView.arrow.setIcon(
+            ImageProvider.fromResource(context, icon),
             IconStyle().setRotationType(RotationType.ROTATE)
         )
         userLocationView.accuracyCircle.fillColor = Color.TRANSPARENT
@@ -164,18 +185,20 @@ class Mapkit(
         Toast.makeText(context, errorMessage, Toast.LENGTH_SHORT).show()
     }
 
-    override fun onCameraPositionChanged(map: Map, cameraPosition: CameraPosition,
-                                         cameraUpdateReason: CameraUpdateReason, finished: Boolean) {
+    override fun onCameraPositionChanged(
+        map: Map, cameraPosition: CameraPosition,
+        cameraUpdateReason: CameraUpdateReason, finished: Boolean
+    ) {
         if (finished) {
             submitQuery(searchEditText.text.toString())
         }
     }
 
-    fun setCarRoute(){
+    fun setCarRoute() {
         route.setCarRoute()
     }
 
-    fun setWalkingRoute(){
+    fun setWalkingRoute() {
         route.setWalkingRoute()
     }
 }

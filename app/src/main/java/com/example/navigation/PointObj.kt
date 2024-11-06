@@ -74,25 +74,9 @@ class PointObj(context: Context, mapView: MapView) {
             }
         }
     }
-    fun deleteWalkingRoute1(){
-        if (Route.carPolylineMapObject1 != null){
-            if (Route.carPolylineMapObject1!!.isValid){
-                mapView.mapWindow.map.mapObjects.remove(Route.carPolylineMapObject1 as MapObject)
-            }
-        }
-    }
-    fun deleteCarRoute1(){
-        if (Route.walkPolylineMapObject1 != null){
-            if (Route.walkPolylineMapObject1!!.isValid){
-                mapView.mapWindow.map.mapObjects.remove(Route.walkPolylineMapObject1 as MapObject)
-            }
-        }
-    }
     fun deleteAllRoute(){
         deleteWalkingRoute()
-        deleteWalkingRoute1()
         deleteCarRoute()
-        deleteCarRoute1()
     }
 
     fun setPoint(latitude: Double, longitude: Double) {
@@ -329,16 +313,6 @@ class PointObj(context: Context, mapView: MapView) {
 
     private fun isRouteHave() {
         deleteSelectedPoint()
-        if (Route.walkRoute) {
-            deleteWalkingRoute()
-            deleteWalkingRoute1()
-            route.setWalkingRoute()
-        }
-        if (Route.carRoute) {
-            deleteCarRoute()
-            deleteCarRoute1()
-            route.setCarRoute()
-        }
     }
 
     private fun deleteSelectedPoint() {

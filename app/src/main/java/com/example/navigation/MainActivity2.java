@@ -14,6 +14,7 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.collection.MutableObjectList;
 import androidx.core.app.ActivityCompat;
 
 import com.example.navigation.databinding.ActivityMain2Binding;
@@ -85,13 +86,13 @@ public class MainActivity2 extends Activity {
                 binding.cardViewFilter.setVisibility(View.VISIBLE);
             }
             if (search != null && !search.isEmpty()) {
-                if (search.equals("ОКЭИ 105 кабинет")){
+                if (search.equals("ОКЭИ 105 кабинет ")){
                     Toast.makeText(this, "ooo", Toast.LENGTH_SHORT).show();
                     mapkit.setE(true);
-                    mapkit.subQuery();
+                    mapkit.subQuery(search);
                 }
                 mapkit.setE(true);
-                mapkit.subQuery();
+                mapkit.subQuery(search);
             }
         });
 
@@ -100,6 +101,7 @@ public class MainActivity2 extends Activity {
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
                 if( event != null && event.getKeyCode() == KeyEvent.KEYCODE_ENTER){
                     search = v.getText().toString();
+                    mapkit.subQuery(search);
                     return true;
                 }
                 return false;
@@ -172,42 +174,42 @@ public class MainActivity2 extends Activity {
             binding.edSearch.setText("Кафе");
             binding.cardViewFilter.setVisibility(View.GONE);
             mapkit.setE(true);
-            mapkit.subQuery();
+            mapkit.subQuery(search);
         });
         binding.btnGasoline.setOnClickListener(v -> {
             search = "заправка";
             binding.edSearch.setText("Заправка");
             binding.cardViewFilter.setVisibility(View.GONE);
             mapkit.setE(true);
-            mapkit.subQuery();
+            mapkit.subQuery(search);
         });
         binding.btnPark.setOnClickListener(v -> {
             search = "парк";
             binding.edSearch.setText("Парк");
             binding.cardViewFilter.setVisibility(View.GONE);
             mapkit.setE(true);
-            mapkit.subQuery();
+            mapkit.subQuery(search);
         });
         binding.btnHospital.setOnClickListener(v -> {
             search = "hospital";
             binding.edSearch.setText("Больница");
             binding.cardViewFilter.setVisibility(View.GONE);
             mapkit.setE(true);
-            mapkit.subQuery();
+            mapkit.subQuery(search);
         });
         binding.btnHotel.setOnClickListener(v -> {
             search = "отель";
             binding.edSearch.setText("Отель");
             binding.cardViewFilter.setVisibility(View.GONE);
             mapkit.setE(true);
-            mapkit.subQuery();
+            mapkit.subQuery(search);
         });
         binding.btnStar.setOnClickListener(v -> {
             search = "Что посмотреть";
             binding.edSearch.setText("Что посмотреть");
             binding.cardViewFilter.setVisibility(View.GONE);
             mapkit.setE(true);
-            mapkit.subQuery();
+            mapkit.subQuery(search);
         });
         binding.btnCross.setOnClickListener(v -> {
             if (binding.info.getVisibility() == View.GONE){
@@ -253,30 +255,27 @@ public class MainActivity2 extends Activity {
                 mapkit.showUserPin();
 
                 indoorNavigation.checkIfUserInBuilding(new Point(location.getLatitude(), location.getLongitude()));
-                indoorNavigation.checkIndoorPoints(new Point(location.getLatitude(), location.getLongitude()));
+
                 if (IndoorNavigation.getRedactPositionState()){
                     indoorNavigation.collegeAuditoriums();
+                    indoorNavigation.checkIndoorPoints(new Point(location.getLatitude(), location.getLongitude()));
                 }else {
                     PolylineMapObject point = indoorNavigation.getItemFromList();
-                    if (point != null){
-                        if (point.isValid()){
-                            mapView.getMapWindow().getMap().getMapObjects().remove((MapObject) point);
-                        }
-                    }
+
                 }
 
                 if (Route.getCarRoute()){
-                    route.setCarRoute1();
-                    pointObj.deleteCarRoute();
+                    mapView.getMapWindow().getMap().getMapObjects().clear();
+                    mapkit.showUserPin();
+                    pointObj.setSelectedPoint(PointObj.getSelectedPointLatitude(), PointObj.getSelectedPointLongitude());
                     route.setCarRoute();
-                    pointObj.deleteCarRoute1();
                 }
 
                 if (Route.getWalkRoute()){
-                    route.setWalkingRoute1();
-                    pointObj.deleteWalkingRoute();
+                    pointObj.deleteAllRoute();
+                    mapkit.showUserPin();
+                    pointObj.setSelectedPoint(PointObj.getSelectedPointLatitude(), PointObj.getSelectedPointLongitude());
                     route.setWalkingRoute();
-                    pointObj.deleteWalkingRoute1();
                 }
                 lat = location.getLatitude();
                 lon = location.getLongitude();

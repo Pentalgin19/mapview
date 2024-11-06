@@ -5,10 +5,9 @@ import android.content.Context
 import android.util.Log
 import android.widget.Toast
 import androidx.core.content.ContextCompat
-import com.example.navigation.IndoorNavigation.Companion.redactPositionState
 import com.yandex.mapkit.geometry.Point
 import com.yandex.mapkit.geometry.Polyline
-import com.yandex.mapkit.map.PlacemarkMapObject
+import com.yandex.mapkit.map.MapObject
 import com.yandex.mapkit.map.PolylineMapObject
 import com.yandex.mapkit.mapview.MapView
 import kotlin.math.abs
@@ -16,9 +15,18 @@ import kotlin.math.abs
 class IndoorNavigation(val map: MapView, val context: Context) {
 
     companion object {
-        @JvmStatic
-        var redactPositionState = true
+        @JvmStatic var redactPositionState = true
     }
+
+    var indoorRoute: MutableList<Point> = mutableListOf(
+        Point(51.765273, 55.124219),
+        Point(51.765294, 55.124176),
+        Point(51.765323, 55.124140),
+        Point(51.765242, 55.123898),
+        Point(51.765230, 55.123901)
+    )
+    var points1: PolylineMapObject? = null
+
 
     val points = listOf(
         Point(51.765273, 55.124219),
@@ -27,6 +35,14 @@ class IndoorNavigation(val map: MapView, val context: Context) {
         Point(51.765242, 55.123898),
         Point(51.765230, 55.123901),
     )
+
+    fun getPointss(): Point? {
+        points.forEach { point ->
+            return point
+        }
+        return null
+    }
+
     val carcas = listOf(
         Point(51.765171, 55.123939),
         Point(51.765119, 55.123990),
@@ -60,6 +76,7 @@ class IndoorNavigation(val map: MapView, val context: Context) {
         Point(51.765240, 55.123872),
         Point(51.765233, 55.123878)
     )
+    var t = true
 
     fun collegeAuditoriums() {
         val k104 = OfficeMap(
@@ -168,8 +185,6 @@ class IndoorNavigation(val map: MapView, val context: Context) {
             )
         )
 
-        val points = map.map.mapObjects.addPolyline(Polyline(points))
-
         val carcasPolyline = Polyline(carcas)
 
         val zal = zalDoor
@@ -180,7 +195,7 @@ class IndoorNavigation(val map: MapView, val context: Context) {
 
         val carcas = map.map.mapObjects.addPolyline(carcasPolyline)
         carcas.apply {
-            setStrokeColor(ContextCompat.getColor(context, R.color.customBlue))
+            setStrokeColor(ContextCompat.getColor(context, R.color.red))
         }
         val k104Room = map.map.mapObjects.addPolyline(Polyline(k104.roomCoords))
         val k105Room = map.map.mapObjects.addPolyline(Polyline(k105.roomCoords))
@@ -200,6 +215,11 @@ class IndoorNavigation(val map: MapView, val context: Context) {
         listOfPoints(cloakRoom)
         listOfPoints(k111Room)
         listOfPoints(k112Room)
+
+        if (t) {
+            points1 = map.map.mapObjects.addPolyline(Polyline(indoorRoute))
+            t = false
+        }
 
         val lader11 = map.map.mapObjects.addPolyline(ladder1)
         val lader22 = map.map.mapObjects.addPolyline(ladder2)
@@ -269,8 +289,9 @@ class IndoorNavigation(val map: MapView, val context: Context) {
     private fun listOfPoints(polylineMapObject: PolylineMapObject) {
         listRoomCords.add(polylineMapObject)
     }
+
     fun getItemFromList(): PolylineMapObject? {
-        listRoomCords.forEach{ item ->
+        listRoomCords.forEach { item ->
             return item
         }
         return null
@@ -300,26 +321,33 @@ class IndoorNavigation(val map: MapView, val context: Context) {
         redactPositionState = false
         Log.i("oioioi", "Пользователь не в здании")
     }
+
     val pointObj = PointObj(context, map)
 
-    fun checkIndoorPoints(position: Point){
+    fun checkIndoorPoints(position: Point) {
         pointObj.deleteAllRoute()
-        val myIndoorRoute = points.toMutableList() // инизиализировать перед началом навигации в здании
 
-        val firstPoint = myIndoorRoute.firstOrNull()
+        val firstPoint = indoorRoute.getOrNull(1)
 
-        if (firstPoint != null){
+        if (firstPoint != null) {
             if (abs(position.latitude - firstPoint.latitude) <= 0.000010
                 && abs(position.longitude - firstPoint.longitude) <= 0.000010
-            ){
-                myIndoorRoute.removeFirstOrNull()
+            ) {
+                indoorRoute.remove(firstPoint)
                 // перерисовать маршрут, каждый раз убирается по точке, пока не дошел до кабинета
-            }else{
+            } else {
                 // перерисовать маршрут, не удаляя точку
             }
+            indoorRoute[0] = position
+            if (points1!!.isValid){
+                map.mapWindow.map.mapObjects.remove(points1 as MapObject)
+            }
+
+            points1 = map.mapWindow.map.mapObjects.addPolyline(Polyline(indoorRoute))
         }
     }
 }
+
 
 data class OfficeMap(
     val roomCoords: List<Point>,

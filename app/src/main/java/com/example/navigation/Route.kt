@@ -45,14 +45,19 @@ class Route(mapView: MapView, context: Context) : DrivingSession.DrivingRouteLis
     companion object {
         @JvmStatic
         var walkRoute = false
+
         @JvmStatic
         var carRoute = false
+
         @JvmStatic
         var walkRoute1 = false
+
         @JvmStatic
         var carRoute1 = false
+
         @JvmStatic
         var carPolylineMapObject: PolylineMapObject? = null
+
         @JvmStatic
         var walkPolylineMapObject: PolylineMapObject? = null
         @JvmStatic
@@ -63,6 +68,8 @@ class Route(mapView: MapView, context: Context) : DrivingSession.DrivingRouteLis
         var tvTime: TextView? = null
         @JvmStatic
         var tvLenght: TextView? = null
+        @JvmStatic
+        val points: MutableList<RequestPoint> = ArrayList()
     }
 
     val context = context
@@ -108,7 +115,6 @@ class Route(mapView: MapView, context: Context) : DrivingSession.DrivingRouteLis
         val transitOptions = TransitOptions(FilterVehicleTypes.NONE.value, TimeOptions())
         val avoidSteep = false
         val routeOptions = RouteOptions(FitnessOptions(avoidSteep))
-        val points: MutableList<RequestPoint> = ArrayList()
         points.clear()
         points.add(
             RequestPoint(
@@ -236,12 +242,32 @@ class Route(mapView: MapView, context: Context) : DrivingSession.DrivingRouteLis
         override fun onMasstransitRoutes(p0: MutableList<Route>) {
             if (p0.size > 0) {
                 for (section in p0[0].sections) {
-                    drawSection1(
+                    drawSection(
                         section.metadata.data,
                         SubpolylineHelper.subpolyline(
                             p0[0].geometry, section.geometry
                         )
                     )
+                }
+                var hours = 0.0
+                var minutes = p0[0].metadata.weight.time.value / 60
+                var times = ""
+                if (minutes < 1) {
+                    times = "1 мин "
+                } else if (minutes > 60) {
+                    hours = minutes / 60
+                    minutes -= hours * 60
+                    times = "${hours.roundToInt()} ч ${minutes.roundToInt()} мин "
+                } else {
+                    times = minutes.roundToInt().toString() + " мин "
+                }
+                tvTime!!.text = times
+                var length = p0[0].metadata.weight.walkingDistance.value
+                if (length > 1000) {
+                    length = (length / 1000).roundToInt().toDouble()
+                    tvLenght!!.text = length.toString() + " км"
+                } else {
+                    tvLenght!!.text = length.roundToInt().toString() + " м"
                 }
             }
         }
@@ -293,7 +319,7 @@ class Route(mapView: MapView, context: Context) : DrivingSession.DrivingRouteLis
         }
     }
 
-    private fun drawSection1(data: SectionData, geometry: Polyline) {
+    private fun drawSection11(data: SectionData, geometry: Polyline) {
         carPolylineMapObject1 = mapView.mapWindow.map.mapObjects.addPolyline(geometry)
         carPolylineMapObject1!!.apply {
             strokeWidth = 5f
