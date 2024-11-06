@@ -146,7 +146,6 @@ public class MainActivity2 extends Activity {
                 pointObj.setSelectedPoint(PointObj.getSelectedPointLatitude(), PointObj.getSelectedPointLongitude());
                 if (IndoorNavigation.getRedactPositionState()){
                     indoorNavigation.collegeAuditoriums();
-                    indoorNavigation.checkIndoorPoints(new Point(PointObj.getMyLatitude(), PointObj.getSelectedPointLongitude()));
                 }
             }
             mapkit.setWalkingRoute();
@@ -160,7 +159,6 @@ public class MainActivity2 extends Activity {
                 pointObj.setSelectedPoint(PointObj.getSelectedPointLatitude(), PointObj.getSelectedPointLongitude());
                 if (IndoorNavigation.getRedactPositionState()){
                     indoorNavigation.collegeAuditoriums();
-                    indoorNavigation.checkIndoorPoints(new Point(PointObj.getMyLatitude(), PointObj.getSelectedPointLongitude()));
                 }
             }
             mapkit.setCarRoute();
