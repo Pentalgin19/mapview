@@ -262,6 +262,8 @@ public class MainActivity2 extends Activity {
                 indoorNavigation.checkIfUserInBuilding(new Point(location.getLatitude(), location.getLongitude()));
 
                 if (IndoorNavigation.getRedactPositionState()){
+                    Route.setCarRoute(false);
+                    Route.setWalkRoute(false);
                     indoorNavigation.collegeAuditoriums();
                     indoorNavigation.checkIndoorPoints(new Point(location.getLatitude(), location.getLongitude()));
                 }else {
