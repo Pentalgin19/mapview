@@ -141,10 +141,8 @@ public class MainActivity2 extends Activity {
             binding.timeLength.setVisibility(View.VISIBLE);
             if (Route.getCarRoute()){
                 pointObj.deleteCarRoute();
-                pointObj.deleteCarRoute1();
             }
             pointObj.deleteWalkingRoute();
-            pointObj.deleteWalkingRoute1();
             mapkit.setWalkingRoute();
         });
 
@@ -152,10 +150,8 @@ public class MainActivity2 extends Activity {
             binding.timeLength.setVisibility(View.VISIBLE);
             if (Route.getWalkRoute()){
                 pointObj.deleteWalkingRoute();
-                pointObj.deleteWalkingRoute1();
             }
             pointObj.deleteCarRoute();
-            pointObj.deleteCarRoute1();
             mapkit.setCarRoute();
         });
 
