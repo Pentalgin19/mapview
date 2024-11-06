@@ -141,18 +141,28 @@ public class MainActivity2 extends Activity {
         binding.btnShowWalkingRoute.setOnClickListener(v -> {
             binding.timeLength.setVisibility(View.VISIBLE);
             if (Route.getCarRoute()){
-                pointObj.deleteCarRoute();
+                mapView.getMapWindow().getMap().getMapObjects().clear();
+                mapkit.showUserPin();
+                pointObj.setSelectedPoint(PointObj.getSelectedPointLatitude(), PointObj.getSelectedPointLongitude());
+                if (IndoorNavigation.getRedactPositionState()){
+                    indoorNavigation.collegeAuditoriums();
+                    indoorNavigation.checkIndoorPoints(new Point(PointObj.getMyLatitude(), PointObj.getSelectedPointLongitude()));
+                }
             }
-            pointObj.deleteWalkingRoute();
             mapkit.setWalkingRoute();
         });
 
         binding.btnShowCarRoute.setOnClickListener(v -> {
             binding.timeLength.setVisibility(View.VISIBLE);
             if (Route.getWalkRoute()){
-                pointObj.deleteWalkingRoute();
+                mapView.getMapWindow().getMap().getMapObjects().clear();
+                mapkit.showUserPin();
+                pointObj.setSelectedPoint(PointObj.getSelectedPointLatitude(), PointObj.getSelectedPointLongitude());
+                if (IndoorNavigation.getRedactPositionState()){
+                    indoorNavigation.collegeAuditoriums();
+                    indoorNavigation.checkIndoorPoints(new Point(PointObj.getMyLatitude(), PointObj.getSelectedPointLongitude()));
+                }
             }
-            pointObj.deleteCarRoute();
             mapkit.setCarRoute();
         });
 
