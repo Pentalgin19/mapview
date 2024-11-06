@@ -18,11 +18,16 @@ import androidx.core.app.ActivityCompat;
 
 import com.example.navigation.databinding.ActivityMain2Binding;
 import com.yandex.mapkit.MapKitFactory;
+import com.yandex.mapkit.geometry.Point;
+import com.yandex.mapkit.map.MapObject;
+import com.yandex.mapkit.map.PolygonMapObject;
+import com.yandex.mapkit.map.PolylineMapObject;
 import com.yandex.mapkit.mapview.MapView;
 import com.yandex.mapkit.search.SearchFactory;
 import com.yandex.mapkit.search.SearchManager;
 import com.yandex.mapkit.search.SearchManagerType;
-import com.yandex.mapkit.user_location.UserLocationLayer;
+
+import java.util.List;
 
 public class MainActivity2 extends Activity {
     public Double lat = 0.00000;
@@ -41,7 +46,7 @@ public class MainActivity2 extends Activity {
     private PointObj pointObj;
     private ClearPoint clearPoint;
     private Route route;
-    private UserLocationLayer userLocationLayer;
+    private IndoorNavigation indoorNavigation;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,6 +60,7 @@ public class MainActivity2 extends Activity {
         searchManager = SearchFactory.getInstance().createSearchManager(SearchManagerType.COMBINED);
         mapView = binding.mapView;
         mapkit = new Mapkit(mapView, this, this, binding.edSearch);
+        indoorNavigation = new IndoorNavigation(mapView, this);
 
         pointObj = new PointObj(this, mapView);
         pointObj.cardView = binding.ll;
@@ -79,6 +85,11 @@ public class MainActivity2 extends Activity {
                 binding.cardViewFilter.setVisibility(View.VISIBLE);
             }
             if (search != null && !search.isEmpty()) {
+                if (search.equals("ОКЭИ 105 кабинет")){
+                    Toast.makeText(this, "ooo", Toast.LENGTH_SHORT).show();
+                    mapkit.setE(true);
+                    mapkit.subQuery();
+                }
                 mapkit.setE(true);
                 mapkit.subQuery();
             }
@@ -239,7 +250,20 @@ public class MainActivity2 extends Activity {
                 PointObj.setMyLatitude(location.getLatitude());
                 PointObj.setMyLongitude(location.getLongitude());
 
-                mapkit.tt();
+                mapkit.showUserPin();
+
+                indoorNavigation.checkIfUserInBuilding(new Point(location.getLatitude(), location.getLongitude()));
+                indoorNavigation.checkIndoorPoints(new Point(location.getLatitude(), location.getLongitude()));
+                if (IndoorNavigation.getRedactPositionState()){
+                    indoorNavigation.collegeAuditoriums();
+                }else {
+                    PolylineMapObject point = indoorNavigation.getItemFromList();
+                    if (point != null){
+                        if (point.isValid()){
+                            mapView.getMapWindow().getMap().getMapObjects().remove((MapObject) point);
+                        }
+                    }
+                }
 
                 if (Route.getCarRoute()){
                     route.setCarRoute1();

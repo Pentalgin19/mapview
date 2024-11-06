@@ -368,30 +368,4 @@ class Route(mapView: MapView, context: Context) : DrivingSession.DrivingRouteLis
         val error = "unknown error"
         Toast.makeText(context, error, Toast.LENGTH_SHORT).show()
     }
-//
-//    fun distanceBetweenPointsOnRoute(route: DrivingRoute, first: Point, second: Point): Double {
-//        val polylineIndex = PolylineUtils.createPolylineIndex(route.geometry)
-//        val firstPosition = polylineIndex.closestPolylinePosition(
-//            first,
-//            PolylineIndex.Priority.CLOSEST_TO_RAW_POINT,
-//            1.0
-//        ) ?: PolylinePosition()
-//        val secondPosition = polylineIndex.closestPolylinePosition(
-//            second,
-//            PolylineIndex.Priority.CLOSEST_TO_RAW_POINT,
-//            1.0
-//        ) ?: PolylinePosition()
-//        return PolylineUtils.distanceBetweenPolylinePositions(
-//            route.geometry,
-//            firstPosition, secondPosition
-//        )
-//    }
-//
-//    fun timeTravelToPoint(route: DrivingRoute, startPoint: Point, endPoint: Point): Double {
-//        val currentPosition = route.routePosition
-//        val distance = distanceBetweenPointsOnRoute(route, startPoint, endPoint)
-//        val targetPosition = currentPosition.advance(distance)
-//        return targetPosition.timeToFinish() - currentPosition.timeToFinish()
-//    }
-
 }

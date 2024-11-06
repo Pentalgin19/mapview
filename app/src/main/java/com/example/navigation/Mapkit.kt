@@ -66,12 +66,16 @@ class Mapkit(
         mapView.mapWindow.map.addCameraListener(this)
         searchEditText.setOnEditorActionListener { _, i, _ ->
             if (i == EditorInfo.IME_ACTION_SEARCH) {
-                submitQuery(searchEditText.text.toString())
+                if (searchEditText.text.toString() == "ОКЭИ 105 кабинет"){
+                    submitQuery("улица Чкалова 11")
+                }else{
+                    submitQuery(searchEditText.text.toString())
+                }
             }
             false
         }
     }
-    fun tt(){
+    fun showUserPin(){
         locationMapkit.isVisible = true
         locationMapkit.isHeadingEnabled = true
         locationMapkit.setObjectListener(this)
@@ -89,7 +93,7 @@ class Mapkit(
     }
 
     var e = true
-    fun submitQuery(query: String) {
+    private fun submitQuery(query: String) {
         if (e) {
             session = searchManager.submit(
                 query,

@@ -5,6 +5,7 @@ import android.view.View
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.cardview.widget.CardView
+import androidx.core.content.ContextCompat
 import com.yandex.mapkit.Animation
 import com.yandex.mapkit.geometry.Point
 import com.yandex.mapkit.geometry.Polyline
@@ -86,6 +87,12 @@ class PointObj(context: Context, mapView: MapView) {
                 mapView.mapWindow.map.mapObjects.remove(Route.walkPolylineMapObject1 as MapObject)
             }
         }
+    }
+    fun deleteAllRoute(){
+        deleteWalkingRoute()
+        deleteWalkingRoute1()
+        deleteCarRoute()
+        deleteCarRoute1()
     }
 
     fun setPoint(latitude: Double, longitude: Double) {
@@ -271,6 +278,7 @@ class PointObj(context: Context, mapView: MapView) {
                 .metadataContainer
                 .getItem(GeoObjectSelectionMetadata::class.java)
             mapView.mapWindow.map.selectGeoObject(selectionMetadata)
+
             selectedPointLatitude = geoObjectTapEvent.geoObject.geometry[0].point!!.latitude
             selectedPointLongitude = geoObjectTapEvent.geoObject.geometry[0].point!!.longitude
             cardView.visibility = View.VISIBLE
@@ -311,11 +319,11 @@ class PointObj(context: Context, mapView: MapView) {
                 SearchFactory.getInstance().createSearchManager(SearchManagerType.COMBINED)
             searchSession1 = searchManager.submit(point, 20, SearchOptions(), searchListener)
 
-            latitude = placemark.geometry.latitude
-            longitude = placemark.geometry.longitude
+            latitude = point.latitude
+            longitude = point.longitude
             cardView.visibility = View.VISIBLE
-            tvLatitude.text = point.latitude.toString()
-            tvLongutude.text = point.longitude.toString()
+            tvLatitude.text = latitude.toString()
+            tvLongutude.text = longitude.toString()
         }
     }
 
