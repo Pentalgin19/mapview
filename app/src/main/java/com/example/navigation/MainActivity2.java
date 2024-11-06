@@ -29,6 +29,7 @@ import com.yandex.mapkit.search.SearchManager;
 import com.yandex.mapkit.search.SearchManagerType;
 
 import java.util.List;
+import java.util.Objects;
 
 public class MainActivity2 extends Activity {
     public Double lat = 0.00000;
@@ -261,14 +262,26 @@ public class MainActivity2 extends Activity {
                 }
 
                 if (Route.getCarRoute()){
+                    mapView.getMapWindow().getMap().getMapObjects().clear();
                     mapkit.showUserPin();
                     pointObj.setSelectedPoint(PointObj.getSelectedPointLatitude(), PointObj.getSelectedPointLongitude());
+                    if (IndoorNavigation.getRedactPositionState()){
+                        indoorNavigation.collegeAuditoriums();
+                        indoorNavigation.checkIndoorPoints(new Point(location.getLatitude(), location.getLongitude()));
+                    }
+                    route.setCarRoute1();
                     route.setCarRoute();
                 }
 
                 if (Route.getWalkRoute()){
+                    mapView.getMapWindow().getMap().getMapObjects().clear();
                     mapkit.showUserPin();
                     pointObj.setSelectedPoint(PointObj.getSelectedPointLatitude(), PointObj.getSelectedPointLongitude());
+                    if (IndoorNavigation.getRedactPositionState()){
+                        indoorNavigation.collegeAuditoriums();
+                        indoorNavigation.checkIndoorPoints(new Point(location.getLatitude(), location.getLongitude()));
+                    }
+                    route.setWalkingRoute1();
                     route.setWalkingRoute();
                 }
                 lat = location.getLatitude();

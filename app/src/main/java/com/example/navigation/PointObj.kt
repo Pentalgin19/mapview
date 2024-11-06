@@ -74,6 +74,20 @@ class PointObj(context: Context, mapView: MapView) {
             }
         }
     }
+    fun deleteWalkingRoute1(){
+        if (Route.carPolylineMapObject1 != null){
+            if (Route.carPolylineMapObject1!!.isValid){
+                mapView.mapWindow.map.mapObjects.remove(Route.carPolylineMapObject1 as MapObject)
+            }
+        }
+    }
+    fun deleteCarRoute1(){
+        if (Route.walkPolylineMapObject1 != null){
+            if (Route.walkPolylineMapObject1!!.isValid){
+                mapView.mapWindow.map.mapObjects.remove(Route.walkPolylineMapObject1 as MapObject)
+            }
+        }
+    }
     fun deleteAllRoute(){
         deleteWalkingRoute()
         deleteCarRoute()
