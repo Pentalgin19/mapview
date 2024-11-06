@@ -63,14 +63,14 @@ class PointObj(context: Context, mapView: MapView) {
     fun deleteWalkingRoute(){
         if (Route.carPolylineMapObject != null){
             if (Route.carPolylineMapObject!!.isValid){
-                mapView.mapWindow.map.mapObjects.remove(Route.carPolylineMapObject as MapObject)
+                mapView.mapWindow.map.mapObjects.remove(Route.carPolylineMapObject!!)
             }
         }
     }
     fun deleteCarRoute(){
         if (Route.walkPolylineMapObject != null){
             if (Route.walkPolylineMapObject!!.isValid){
-                mapView.mapWindow.map.mapObjects.remove(Route.walkPolylineMapObject as MapObject)
+                mapView.mapWindow.map.mapObjects.remove(Route.walkPolylineMapObject!!)
             }
         }
     }
