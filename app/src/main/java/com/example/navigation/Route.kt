@@ -36,17 +36,37 @@ import com.yandex.mapkit.transport.masstransit.Transport
 import com.yandex.runtime.Error
 import com.yandex.runtime.network.NetworkError
 import com.yandex.runtime.network.RemoteError
+import kotlin.math.roundToInt
 
 
 class Route(mapView: MapView, context: Context) : DrivingSession.DrivingRouteListener{
 
     companion object{
-        @JvmStatic var walkRoute = false
-        @JvmStatic var carRoute = false
-        @JvmStatic var carPolylineMapObject: PolylineMapObject? = null
-        @JvmStatic var walkPolylineMapObject:  PolylineMapObject? = null
-        @JvmStatic var tvTime: TextView? = null
-        @JvmStatic var tvLenght: TextView? = null
+        @JvmStatic
+        var walkRoute = false
+
+        @JvmStatic
+        var carRoute = false
+
+        @JvmStatic
+        var walkRoute1 = false
+
+        @JvmStatic
+        var carRoute1 = false
+
+        @JvmStatic
+        var carPolylineMapObject: PolylineMapObject? = null
+
+        @JvmStatic
+        var walkPolylineMapObject: PolylineMapObject? = null
+        @JvmStatic
+        var carPolylineMapObject1: PolylineMapObject? = null
+        @JvmStatic
+        var walkPolylineMapObject1: PolylineMapObject? = null
+        @JvmStatic
+        var tvTime: TextView? = null
+        @JvmStatic
+        var tvLenght: TextView? = null
     }
     val context = context
     val mapView = mapView
@@ -115,6 +135,26 @@ class Route(mapView: MapView, context: Context) : DrivingSession.DrivingRouteLis
                         )
                     )
                 }
+                var hours = 0.0
+                var minutes = p0[0].metadata.weight.time.value / 60
+                var times = ""
+                if (minutes < 1) {
+                    times = "1 мин "
+                } else if (minutes > 60) {
+                    hours = minutes / 60
+                    minutes -= hours * 60
+                    times = "${hours.roundToInt()} ч ${minutes.roundToInt()} мин "
+                } else {
+                    times = minutes.roundToInt().toString() + " мин "
+                }
+                tvTime!!.text = times
+                var length = p0[0].metadata.weight.walkingDistance.value
+                if (length > 1000) {
+                    length = (length / 1000).roundToInt().toDouble()
+                    tvLenght!!.text = length.toString() + " км"
+                } else {
+                    tvLenght!!.text = length.roundToInt().toString() + " м"
+                }
             }
         }
 
@@ -175,37 +215,35 @@ class Route(mapView: MapView, context: Context) : DrivingSession.DrivingRouteLis
     }
 
     override fun onDrivingRoutes(p0: MutableList<DrivingRoute>) {
-        for (route in p0) {
-            walkPolylineMapObject = mapView.mapWindow.map.mapObjects.addPolyline(route.geometry)
-            walkPolylineMapObject!!.apply {
-                strokeWidth = 5f
-                setStrokeColor(ContextCompat.getColor(context, R.color.customBlue))
-                dashLength = 6f
-                gapLength = 6f
-            }
+        walkPolylineMapObject = mapView.mapWindow.map.mapObjects.addPolyline(p0[0].geometry)
+        walkPolylineMapObject!!.apply {
+            strokeWidth = 5f
+            setStrokeColor(ContextCompat.getColor(context, R.color.customBlue))
+            dashLength = 6f
+            gapLength = 6f
         }
-
+        var hours = 0.0
+        var minutes = p0[0].metadata.weight.time.value / 60
+        var times = ""
+        if (minutes > 60) {
+            hours = minutes / 60
+            minutes -= hours * 60
+            times = "${hours.roundToInt()} ч ${minutes.roundToInt()} мин "
+        } else {
+            times = minutes.roundToInt().toString() + " мин "
+        }
+        tvTime!!.text = times
+        var length = p0[0].metadata.weight.distance.value
+        if (length > 1000) {
+            length = (length / 1000).roundToInt().toDouble()
+            tvLenght!!.text = length.toString() + " км"
+        } else {
+            tvLenght!!.text = length.roundToInt().toString() + " м"
+        }
     }
 
     override fun onDrivingRoutesError(p0: Error) {
         val error = "unknown error"
         Toast.makeText(context, error, Toast.LENGTH_SHORT).show()
     }
-
-    fun distanceBetweenPointsOnRoute(route: DrivingRoute, first: Point, second: Point): Double {
-        val polylineIndex = PolylineUtils.createPolylineIndex(route.geometry)
-        val firstPosition = polylineIndex.closestPolylinePosition(first, PolylineIndex.Priority.CLOSEST_TO_RAW_POINT, 1.0)!!
-        val secondPosition = polylineIndex.closestPolylinePosition(second, PolylineIndex.Priority.CLOSEST_TO_RAW_POINT, 1.0)!!
-        return PolylineUtils.distanceBetweenPolylinePositions(route.geometry,
-            firstPosition, secondPosition
-        )
-    }
-
-    fun timeTravelToPoint(route: DrivingRoute, point: Point): Double {
-        val currentPosition = route.routePosition
-        val distance = distanceBetweenPointsOnRoute(route, currentPosition.point, point)
-        val targetPosition = currentPosition.advance(distance)
-        return targetPosition.timeToFinish() - currentPosition.timeToFinish()
-    }
-
 }
