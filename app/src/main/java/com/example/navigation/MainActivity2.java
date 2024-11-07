@@ -62,7 +62,7 @@ public class MainActivity2 extends Activity {
         searchManager = SearchFactory.getInstance().createSearchManager(SearchManagerType.COMBINED);
         mapView = binding.mapView;
         mapkit = new Mapkit(mapView, this, this, binding.edSearch);
-        indoorNavigation = new IndoorNavigation(mapView, this);
+        indoorNavigation = new IndoorNavigation(mapView, mapkit, this);
 
         pointObj = new PointObj(this, mapView);
         pointObj.cardView = binding.ll;
@@ -72,7 +72,6 @@ public class MainActivity2 extends Activity {
         pointObj.addTapAndInputListener();
         pointObj.info = binding.info;
         pointObj.cardViewFilter = binding.cardViewFilter;
-
 
         route = new Route(mapView, this);
         Route.setTvTime(binding.tvTime);
@@ -96,18 +95,14 @@ public class MainActivity2 extends Activity {
                 mapkit.subQuery(search);
             }
         });
-
-        binding.edSearch.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-            @Override
-            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-                if( event != null && event.getKeyCode() == KeyEvent.KEYCODE_ENTER){
-                    search = v.getText().toString();
-                    mapkit.subQuery(search);
-                    return true;
-                }
-                return false;
-
+        binding.edSearch.setOnEditorActionListener((v, actionId, event) -> {
+            if( event != null && event.getKeyCode() == KeyEvent.KEYCODE_ENTER){
+                search = v.getText().toString();
+                mapkit.subQuery(search);
+                return true;
             }
+            return false;
+
         });
         binding.edSearch.addTextChangedListener(new TextWatcher() {
             @Override
@@ -266,9 +261,6 @@ public class MainActivity2 extends Activity {
                     Route.setWalkRoute(false);
                     indoorNavigation.collegeAuditoriums();
                     indoorNavigation.checkIndoorPoints(new Point(location.getLatitude(), location.getLongitude()));
-                }else {
-                    PolylineMapObject point = indoorNavigation.getItemFromList();
-
                 }
 
                 if (Route.getCarRoute()){

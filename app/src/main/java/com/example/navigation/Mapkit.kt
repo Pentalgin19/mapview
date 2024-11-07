@@ -101,6 +101,11 @@ class Mapkit(
         locationMapkit.setObjectListener(this)
     }
 
+    fun closeUserPin() {
+        locationMapkit.isVisible = false
+        locationMapkit.isHeadingEnabled = false
+    }
+
     private var t = false
     fun showTrafficJams() {
         if (t) {
@@ -144,7 +149,7 @@ class Mapkit(
     }
 
     override fun onObjectAdded(userLocationView: UserLocationView) {
-        val icon = com.example.navigation.R.drawable.ic_me
+        val icon = R.drawable.ic_me
         userLocationView.arrow.setIcon(
             ImageProvider.fromResource(context, icon),
             IconStyle().setRotationType(RotationType.ROTATE)

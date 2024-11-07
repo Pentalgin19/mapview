@@ -3,19 +3,30 @@ package com.example.navigation
 import android.annotation.SuppressLint
 import android.content.Context
 import android.util.Log
-import android.widget.Toast
 import androidx.core.content.ContextCompat
+import com.yandex.mapkit.MapKitFactory
 import com.yandex.mapkit.geometry.Point
 import com.yandex.mapkit.geometry.Polyline
 import com.yandex.mapkit.map.MapObject
+import com.yandex.mapkit.map.PlacemarkMapObject
 import com.yandex.mapkit.map.PolylineMapObject
 import com.yandex.mapkit.mapview.MapView
+import com.yandex.runtime.image.ImageProvider
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import kotlin.math.abs
 
-class IndoorNavigation(val map: MapView, val context: Context) {
+class IndoorNavigation(
+    val map: MapView,
+    val mapkit: Mapkit,
+    val context: Context
+) {
 
     companion object {
-        @JvmStatic var redactPositionState = true
+        @JvmStatic
+        var redactPositionState = false
     }
 
     var indoorRoute: MutableList<Point> = mutableListOf(
@@ -25,23 +36,34 @@ class IndoorNavigation(val map: MapView, val context: Context) {
         Point(51.765242, 55.123898),
         Point(51.765230, 55.123901)
     )
-    var points1: PolylineMapObject? = null
+    var indoorRoutePolylineObject: PolylineMapObject? = null
 
-
-    val points = listOf(
-        Point(51.765273, 55.124219),
-        Point(51.765294, 55.124176),
-        Point(51.765323, 55.124140),
-        Point(51.765242, 55.123898),
-        Point(51.765230, 55.123901),
+    val newPoints = mutableListOf(
+        Point(51.765268, 55.124222),
+        Point(51.765271, 55.124206),
+        Point(51.765278, 55.124195),
+        Point(51.765289, 55.124185),
+        Point(51.765298, 55.124176),
+        Point(51.765305, 55.124169),
+        Point(51.765311, 55.124162),
+        Point(51.765318, 55.124156),
+        Point(51.765325, 55.124150),
+        Point(51.765321, 55.124137),
+        Point(51.765316, 55.124120),
+        Point(51.765310, 55.124101),
+        Point(51.765304, 55.124084),
+        Point(51.765298, 55.124065),
+        Point(51.765290, 55.124048),
+        Point(51.765284, 55.124031),
+        Point(51.765278, 55.124013),
+        Point(51.765271, 55.123996),
+        Point(51.765266, 55.123979),
+        Point(51.765259, 55.123960),
+        Point(51.765253, 55.123945),
+        Point(51.765246, 55.123927),
+        Point(51.765239, 55.123910),
+        Point(51.765229, 55.123904),
     )
-
-    fun getPointss(): Point? {
-        points.forEach { point ->
-            return point
-        }
-        return null
-    }
 
     val carcas = listOf(
         Point(51.765171, 55.123939),
@@ -76,6 +98,7 @@ class IndoorNavigation(val map: MapView, val context: Context) {
         Point(51.765240, 55.123872),
         Point(51.765233, 55.123878)
     )
+
     var t = true
 
     fun collegeAuditoriums() {
@@ -194,9 +217,9 @@ class IndoorNavigation(val map: MapView, val context: Context) {
         val ladder2 = Polyline(ladder2)
 
         val carcas = map.map.mapObjects.addPolyline(carcasPolyline)
-        carcas.apply {
-            setStrokeColor(ContextCompat.getColor(context, R.color.red))
-        }
+//        carcas.apply {
+//            setStrokeColor(ContextCompat.getColor(context, R.color.red))
+//        }
         val k104Room = map.map.mapObjects.addPolyline(Polyline(k104.roomCoords))
         val k105Room = map.map.mapObjects.addPolyline(Polyline(k105.roomCoords))
         val k106Room = map.map.mapObjects.addPolyline(Polyline(k106.roomCoords))
@@ -217,7 +240,13 @@ class IndoorNavigation(val map: MapView, val context: Context) {
         listOfPoints(k112Room)
 
         if (t) {
-            points1 = map.map.mapObjects.addPolyline(Polyline(indoorRoute))
+            indoorRoutePolylineObject = map.map.mapObjects.addPolyline(Polyline(indoorRoute))
+                .apply {
+                    dashLength = 6f
+                    gapLength = 6f
+                    setStrokeColor(ContextCompat.getColor(context, R.color.customBlue))
+                    strokeWidth = 3f
+                }
             t = false
         }
 
@@ -282,19 +311,13 @@ class IndoorNavigation(val map: MapView, val context: Context) {
         k112Door.apply {
             setStrokeColor(ContextCompat.getColor(context, R.color.black))
         }
+
     }
 
     var listRoomCords: MutableList<PolylineMapObject> = mutableListOf()
 
     private fun listOfPoints(polylineMapObject: PolylineMapObject) {
         listRoomCords.add(polylineMapObject)
-    }
-
-    fun getItemFromList(): PolylineMapObject? {
-        listRoomCords.forEach { item ->
-            return item
-        }
-        return null
     }
 
     val okeiBorders = mapOf(
@@ -323,31 +346,79 @@ class IndoorNavigation(val map: MapView, val context: Context) {
     }
 
     val pointObj = PointObj(context, map)
+    var userIcon: PlacemarkMapObject? = null
+
+    var isIndoor: Boolean = false
 
     fun checkIndoorPoints(position: Point) {
         pointObj.deleteAllRoute()
 
-        val firstPoint = indoorRoute.getOrNull(1)
+        if (
+            abs(position.latitude - 51.765268) <= 0.000010
+            && abs(position.longitude - 55.124222) <= 0.000010
+        ) {
+            // удалить
+            CoroutineScope(Dispatchers.Main).launch {
+                for (i in 0..<newPoints.size) {
+                    mapkit.closeUserPin()
+                    newPoints.removeFirstOrNull()
+                    delay(1000)
 
-        if (firstPoint != null) {
+                    if (indoorRoutePolylineObject?.isValid == true) {
+                        map.mapWindow.map.mapObjects.remove(indoorRoutePolylineObject as MapObject)
+                    }
+
+                    indoorRoutePolylineObject =
+                        map.mapWindow.map.mapObjects.addPolyline(Polyline(newPoints))
+                            .apply {
+                                dashLength = 6f
+                                gapLength = 6f
+                                setStrokeColor(ContextCompat.getColor(context, R.color.customBlue))
+                                strokeWidth = 3f
+                            }
+                    userIcon = newPoints.firstOrNull()
+                        ?.let {
+                            userIcon?.let { userIcon ->
+                                map.mapWindow.map.mapObjects.remove(userIcon as MapObject)
+                            }
+
+                            map.mapWindow.map.mapObjects.addPlacemark(
+                                it,
+                                ImageProvider.fromResource(context, R.drawable.ic_me)
+                            )
+                        }
+                }
+            }
+            isIndoor = true
+            // удалить
+        }
+
+        if (!isIndoor) {
+            val firstPoint = indoorRoute.getOrNull(1) ?: return
+
             if (abs(position.latitude - firstPoint.latitude) <= 0.000010
                 && abs(position.longitude - firstPoint.longitude) <= 0.000010
             ) {
                 indoorRoute.remove(firstPoint)
-                // перерисовать маршрут, каждый раз убирается по точке, пока не дошел до кабинета
-            } else {
-                // перерисовать маршрут, не удаляя точку
-            }
-            indoorRoute[0] = position
-            if (points1!!.isValid){
-                map.mapWindow.map.mapObjects.remove(points1 as MapObject)
             }
 
-            points1 = map.mapWindow.map.mapObjects.addPolyline(Polyline(indoorRoute))
+            indoorRoute[0] = position
+            if (indoorRoutePolylineObject?.isValid == true) {
+                map.mapWindow.map.mapObjects.remove(indoorRoutePolylineObject as MapObject)
+            }
+
+            indoorRoutePolylineObject =
+                map.mapWindow.map.mapObjects.addPolyline(Polyline(indoorRoute))
+                    .apply {
+                        dashLength = 6f
+                        gapLength = 6f
+                        setStrokeColor(ContextCompat.getColor(context, R.color.customBlue))
+                        strokeWidth = 3f
+                    }
         }
+
     }
 }
-
 
 data class OfficeMap(
     val roomCoords: List<Point>,
